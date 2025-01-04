@@ -30,6 +30,8 @@ import android.os.Looper;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AlertDialog;
@@ -42,12 +44,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.best.deskclock.ItemAdapter;
 import com.best.deskclock.ItemAdapter.OnItemClickedListener;
-import com.best.deskclock.LogUtils;
 import com.best.deskclock.R;
-import com.best.deskclock.RingtonePreviewKlaxon;
 import com.best.deskclock.alarms.AlarmUpdateHandler;
 import com.best.deskclock.data.DataModel;
 import com.best.deskclock.provider.Alarm;
+import com.best.deskclock.utils.LogUtils;
 import com.best.deskclock.widget.CollapsingToolbarBaseActivity;
 
 import java.util.List;
@@ -130,6 +131,31 @@ public class RingtonePickerActivity extends CollapsingToolbarBaseActivity
      * Identifies the title of the ringtone picker activity that appears in the action bar.
      */
     private int mTitleResourceId;
+
+    /**
+     * Callback for getting the result from Activity
+     */
+    private final ActivityResultLauncher<Intent> getActivity = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), (result) -> {
+                if (result.getResultCode() != RESULT_OK ) {
+                    return;
+                }
+
+                Intent intent = result.getData();
+                final Uri uri = intent == null ? null : intent.getData();
+                if (uri == null) {
+                    return;
+                }
+
+                // Bail if the permission to read (playback) the audio at the uri was not granted.
+                final int flags = intent.getFlags() & FLAG_GRANT_READ_URI_PERMISSION;
+                if (flags != FLAG_GRANT_READ_URI_PERMISSION) {
+                    return;
+                }
+
+                // Start a task to fetch the display name of the audio content and add the custom ringtone.
+                addCustomRingtoneAsync(uri);
+            });
 
     /**
      * @return an intent that launches the ringtone picker to edit the ringtone of the given
@@ -304,28 +330,6 @@ public class RingtonePickerActivity extends CollapsingToolbarBaseActivity
     public void onLoaderReset(@NonNull Loader<List<ItemAdapter.ItemHolder<Uri>>> loader) {
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != RESULT_OK) {
-            return;
-        }
-
-        final Uri uri = data == null ? null : data.getData();
-        if (uri == null) {
-            return;
-        }
-
-        // Bail if the permission to read (playback) the audio at the uri was not granted.
-        final int flags = data.getFlags() & FLAG_GRANT_READ_URI_PERMISSION;
-        if (flags != FLAG_GRANT_READ_URI_PERMISSION) {
-            return;
-        }
-
-        // Start a task to fetch the display name of the audio content and add the custom ringtone.
-        addCustomRingtoneAsync(uri);
-    }
-
     private void onItemRemovedClicked(int indexOfRingtoneToRemove) {
         // Find the ringtone to be removed.
         final List<ItemAdapter.ItemHolder<Uri>> items = mRingtoneAdapter.getItems();
@@ -452,10 +456,10 @@ public class RingtonePickerActivity extends CollapsingToolbarBaseActivity
             switch (id) {
                 case AddCustomRingtoneViewHolder.CLICK_ADD_NEW -> {
                     stopPlayingRingtone(getSelectedRingtoneHolder(), false);
-                    startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT)
+                    getActivity.launch(new Intent(Intent.ACTION_OPEN_DOCUMENT)
                             .addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
                             .addCategory(Intent.CATEGORY_OPENABLE)
-                            .setType("audio/*"), 0);
+                            .setType("audio/*"));
                 }
                 case RingtoneViewHolder.CLICK_NORMAL -> {
                     final RingtoneHolder oldSelection = getSelectedRingtoneHolder();

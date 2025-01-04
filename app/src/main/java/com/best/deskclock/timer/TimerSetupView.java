@@ -8,7 +8,7 @@ package com.best.deskclock.timer;
 
 import static com.best.deskclock.FabContainer.FAB_REQUEST_FOCUS;
 import static com.best.deskclock.FabContainer.FAB_SHRINK_AND_EXPAND;
-import static com.best.deskclock.settings.SettingsActivity.KEY_AMOLED_DARK_MODE;
+import static com.best.deskclock.settings.InterfaceCustomizationActivity.KEY_AMOLED_DARK_MODE;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -29,11 +29,12 @@ import android.widget.TextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.best.deskclock.FabContainer;
-import com.best.deskclock.FormattedTextUtils;
 import com.best.deskclock.R;
-import com.best.deskclock.Utils;
 import com.best.deskclock.data.DataModel;
 import com.best.deskclock.uidata.UiDataModel;
+import com.best.deskclock.utils.FormattedTextUtils;
+import com.best.deskclock.utils.Utils;
+
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.color.MaterialColors;
 
@@ -87,8 +88,8 @@ public class TimerSetupView extends LinearLayout implements View.OnClickListener
         final int marginButtonTop = Utils.toPixel(10, getContext());
         final int marginButtonBottom = Utils.toPixel(10, getContext());
         final boolean isCardBackgroundDisplayed = DataModel.getDataModel().isCardBackgroundDisplayed();
-        final boolean isCardBackgroundBorderDisplayed = DataModel.getDataModel().isCardBackgroundBorderDisplayed();
-        final String getDarkMode = DataModel.getDataModel().getDarkMode();
+        final boolean isCardBorderDisplayed = DataModel.getDataModel().isCardBorderDisplayed();
+        final String darkMode = DataModel.getDataModel().getDarkMode();
 
         mTimeView = findViewById(R.id.timer_setup_time);
         mDeleteButton = findViewById(R.id.timer_setup_delete);
@@ -110,7 +111,7 @@ public class TimerSetupView extends LinearLayout implements View.OnClickListener
                 digitButton.setBackgroundTintList(ColorStateList.valueOf(
                         MaterialColors.getColor(getContext(), com.google.android.material.R.attr.colorSurface, Color.BLACK))
                 );
-            } else if (Utils.isNight(getContext().getResources()) && getDarkMode.equals((KEY_AMOLED_DARK_MODE))) {
+            } else if (Utils.isNight(getContext().getResources()) && darkMode.equals(KEY_AMOLED_DARK_MODE)) {
                 digitButton.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
             } else {
                 digitButton.setBackgroundTintList(ColorStateList.valueOf(
@@ -119,7 +120,7 @@ public class TimerSetupView extends LinearLayout implements View.OnClickListener
                 digitButton.setStateListAnimator(null);
             }
 
-            if (isCardBackgroundBorderDisplayed) {
+            if (isCardBorderDisplayed) {
                 digitButton.setStrokeWidth(Utils.toPixel(2, getContext()));
                 digitButton.setStrokeColor(ColorStateList.valueOf(
                         MaterialColors.getColor(getContext(), com.google.android.material.R.attr.colorPrimary, Color.BLACK))
@@ -142,7 +143,7 @@ public class TimerSetupView extends LinearLayout implements View.OnClickListener
             mDeleteButton.setBackgroundTintList(ColorStateList.valueOf(
                     MaterialColors.getColor(getContext(), com.google.android.material.R.attr.colorPrimaryContainer, Color.BLACK))
             );
-        } else if (Utils.isNight(getContext().getResources()) && getDarkMode.equals((KEY_AMOLED_DARK_MODE))) {
+        } else if (Utils.isNight(getContext().getResources()) && darkMode.equals((KEY_AMOLED_DARK_MODE))) {
             doubleZeroButton.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
             mDeleteButton.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
         } else {
@@ -156,7 +157,7 @@ public class TimerSetupView extends LinearLayout implements View.OnClickListener
             mDeleteButton.setStateListAnimator(null);
         }
 
-        if (isCardBackgroundBorderDisplayed) {
+        if (isCardBorderDisplayed) {
             doubleZeroButton.setStrokeWidth(Utils.toPixel(2, getContext()));
             doubleZeroButton.setStrokeColor(ColorStateList.valueOf(
                     MaterialColors.getColor(getContext(), com.google.android.material.R.attr.colorPrimaryInverse, Color.BLACK))

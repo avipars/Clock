@@ -11,11 +11,11 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static android.media.AudioManager.FLAG_SHOW_UI;
 import static android.media.AudioManager.STREAM_ALARM;
 import static android.provider.Settings.ACTION_SOUND_SETTINGS;
-import static com.best.deskclock.Utils.enforceMainLooper;
-import static com.best.deskclock.Utils.enforceNotMainLooper;
-import static com.best.deskclock.settings.SettingsActivity.DARK_THEME;
-import static com.best.deskclock.settings.SettingsActivity.LIGHT_THEME;
-import static com.best.deskclock.settings.SettingsActivity.SYSTEM_THEME;
+import static com.best.deskclock.settings.InterfaceCustomizationActivity.DARK_THEME;
+import static com.best.deskclock.settings.InterfaceCustomizationActivity.LIGHT_THEME;
+import static com.best.deskclock.settings.InterfaceCustomizationActivity.SYSTEM_THEME;
+import static com.best.deskclock.utils.Utils.enforceMainLooper;
+import static com.best.deskclock.utils.Utils.enforceNotMainLooper;
 
 import android.app.Service;
 import android.content.ActivityNotFoundException;
@@ -32,9 +32,8 @@ import android.widget.Toast;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatDelegate;
 
-import com.best.deskclock.Predicate;
 import com.best.deskclock.R;
-import com.best.deskclock.settings.SettingsActivity;
+import com.best.deskclock.settings.InterfaceCustomizationActivity;
 import com.best.deskclock.timer.TimerService;
 
 import java.util.ArrayList;
@@ -47,8 +46,6 @@ import java.util.List;
  * All application-wide data is accessible through this singleton.
  */
 public final class DataModel {
-
-    public static final String ACTION_WORLD_CITIES_CHANGED = "com.best.deskclock.WORLD_CITIES_CHANGED";
 
     /**
      * The single instance of this data model that exists for the life of the application.
@@ -123,7 +120,7 @@ public final class DataModel {
         if (mContext != context) {
             mContext = context.getApplicationContext();
 
-            final String themeValue = prefs.getString(SettingsActivity.KEY_THEME, SYSTEM_THEME);
+            final String themeValue = prefs.getString(InterfaceCustomizationActivity.KEY_THEME, SYSTEM_THEME);
             switch (themeValue) {
                 case SYSTEM_THEME ->
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
@@ -177,6 +174,7 @@ public final class DataModel {
     /**
      * Posts a runnable to the main thread and blocks until the runnable executes. Used to access
      * the data model from the main thread.
+     * @noinspection SynchronizationOnLocalVariableOrMethodParameter
      */
     public void run(Runnable runnable, long waitMillis) throws InterruptedException {
         if (Looper.myLooper() == Looper.getMainLooper()) {
@@ -365,12 +363,13 @@ public final class DataModel {
     /**
      * @param length         the length of the timer in milliseconds
      * @param label          describes the purpose of the timer
+     * @param buttonTime     the time indicated in the timer time add button
      * @param deleteAfterUse {@code true} indicates the timer should be deleted when it is reset
      * @return the newly added timer
      */
-    public Timer addTimer(long length, String label, boolean deleteAfterUse) {
+    public Timer addTimer(long length, String label, String buttonTime, boolean deleteAfterUse) {
         enforceMainLooper();
-        return mTimerModel.addTimer(length, label, deleteAfterUse);
+        return mTimerModel.addTimer(length, label, buttonTime, deleteAfterUse);
     }
 
     /**
@@ -424,7 +423,7 @@ public final class DataModel {
 
     /**
      * If the given {@code timer} is expired and marked for deletion after use then this method
-     * removes the the timer. The timer is otherwise transitioned to the reset state and continues
+     * removes the timer. The timer is otherwise transitioned to the reset state and continues
      * to exist.
      *
      * @param timer        the timer to be reset
@@ -466,11 +465,11 @@ public final class DataModel {
     }
 
     /**
-     * @param timer the timer to which a minute should be added to the remaining time
+     * @param timer the timer to which minutes or hours should be added to the remaining time
      */
-    public void addTimerMinute(Timer timer) {
+    public void addCustomTimeToTimer(Timer timer) {
         enforceMainLooper();
-        mTimerModel.updateTimer(timer.addMinute());
+        mTimerModel.updateTimer(timer.addCustomTime());
     }
 
     /**
@@ -480,6 +479,15 @@ public final class DataModel {
     public void setTimerLabel(Timer timer, String label) {
         enforceMainLooper();
         mTimerModel.updateTimer(timer.setLabel(label));
+    }
+
+    /**
+     * @param timer the timer to which the new {@code buttonTime} belongs
+     * @param buttonTime the new add button text to store for the {@code timer}
+     */
+    public void setTimerButtonTime(Timer timer, String buttonTime) {
+        enforceMainLooper();
+        mTimerModel.updateTimer(timer.setButtonTime(buttonTime));
     }
 
     /**
@@ -556,6 +564,74 @@ public final class DataModel {
     }
 
     /**
+     * @return whether the expired timer is reset with the volume buttons. {@code false} otherwise.
+     */
+    public boolean isExpiredTimerResetWithVolumeButtons() {
+        return mTimerModel.isExpiredTimerResetWithVolumeButtons();
+    }
+
+    /**
+     * @return whether the expired timer is reset with the power button. {@code false} otherwise.
+     */
+    public boolean isExpiredTimerResetWithPowerButton() {
+        return mTimerModel.isExpiredTimerResetWithPowerButton();
+    }
+
+    /**
+     * @return whether flip action for timers is enabled. {@code false} otherwise.
+     */
+    public boolean isFlipActionForTimersEnabled() {
+        return mTimerModel.isFlipActionForTimersEnabled();
+    }
+
+    /**
+     * @return whether shake action for timers is enabled. {@code false} otherwise.
+     */
+    public boolean isShakeActionForTimersEnabled() {
+        return mTimerModel.isShakeActionForTimersEnabled();
+    }
+
+    /**
+     * @return the timer sorting manually, in ascending order of duration, in descending order of duration or by name
+     */
+    public String getTimerSortingPreference() {
+        enforceMainLooper();
+        return mTimerModel.getTimerSortingPreference();
+    }
+
+    /**
+     * @return the default minutes or hour to add to timer when the "Add Minute Or Hour" button is clicked.
+     */
+    public int getDefaultTimeToAddToTimer() {
+        enforceMainLooper();
+        return mTimerModel.getDefaultTimeToAddToTimer();
+    }
+
+    /**
+     * @return {@code true} if the timer display must remain on. {@code false} otherwise.
+     */
+    public boolean shouldTimerDisplayRemainOn() {
+        enforceMainLooper();
+        return mTimerModel.shouldTimerDisplayRemainOn();
+    }
+
+    /**
+     * @return {@code true} if the timer background must be transparent. {@code false} otherwise.
+     */
+    public boolean isTimerBackgroundTransparent() {
+        enforceMainLooper();
+        return mTimerModel.isTimerBackgroundTransparent();
+    }
+
+    /**
+     * @return {@code true} if a warning is displayed before deleting a timer. {@code false} otherwise.
+     */
+    public boolean isWarningDisplayedBeforeDeletingTimer() {
+        enforceMainLooper();
+        return mTimerModel.isWarningDisplayedBeforeDeletingTimer();
+    }
+
+    /**
      * @return the uri of the default ringtone from the settings to play for all alarms when no user selection exists
      */
     public Uri getDefaultAlarmRingtoneUriFromSettings() {
@@ -607,7 +683,7 @@ public final class DataModel {
     /**
      * @return the behavior to execute when volume buttons are pressed while firing an alarm
      */
-    public AlarmVolumeButtonBehavior getAlarmVolumeButtonBehavior() {
+    public VolumeButtonBehavior getAlarmVolumeButtonBehavior() {
         enforceMainLooper();
         return mAlarmModel.getAlarmVolumeButtonBehavior();
     }
@@ -615,7 +691,7 @@ public final class DataModel {
     /**
      * @return the behavior to execute when power buttons are pressed while firing an alarm
      */
-    public AlarmVolumeButtonBehavior getAlarmPowerButtonBehavior() {
+    public PowerButtonBehavior getAlarmPowerButtonBehavior() {
         enforceMainLooper();
         return mAlarmModel.getAlarmPowerButtonBehavior();
     }
@@ -640,6 +716,133 @@ public final class DataModel {
 
     public int getShakeAction() {
         return mAlarmModel.getShakeAction();
+    }
+
+    /**
+     * @return the number of minutes before the upcoming alarm notification appears
+     */
+    public int getAlarmNotificationReminderTime() {
+        return mAlarmModel.getAlarmNotificationReminderTime();
+    }
+
+    /**
+     * @return {@code true} if alarm vibrations are enabled when creating alarms. {@code false} otherwise.
+     */
+    public boolean areAlarmVibrationsEnabledByDefault() {
+        return mAlarmModel.areAlarmVibrationsEnabledByDefault();
+    }
+
+    /**
+     * @return {@code true} if occasional alarm should be deleted by default. {@code false} otherwise.
+     */
+    public boolean isOccasionalAlarmDeletedByDefault() {
+        return mAlarmModel.isOccasionalAlarmDeletedByDefault();
+    }
+
+    /**
+     * @return the time picker style.
+     */
+    public String getMaterialTimePickerStyle() {
+        return mAlarmModel.getMaterialTimePickerStyle();
+    }
+
+    /**
+     * @return a value indicating whether analog or digital clocks are displayed on the alarm.
+     */
+    public ClockStyle getAlarmClockStyle() {
+        return mAlarmModel.getAlarmClockStyle();
+    }
+
+    /**
+     * @return a value indicating whether analog clock seconds hand is displayed on the alarm.
+     */
+    public boolean isAlarmSecondsHandDisplayed() {
+        return mAlarmModel.isAlarmSecondsHandDisplayed();
+    }
+
+    /**
+     * @return a value indicating alarm background color.
+     */
+    public int getAlarmBackgroundColor() {
+        return mAlarmModel.getAlarmBackgroundColor();
+    }
+
+    /**
+     * @return a value indicating alarm background amoled color.
+     */
+    public int getAlarmBackgroundAmoledColor() {
+        return mAlarmModel.getAlarmBackgroundAmoledColor();
+    }
+
+    /**
+     * @return a value indicating the alarm clock color.
+     */
+    public int getAlarmClockColor() {
+        return mAlarmModel.getAlarmClockColor();
+    }
+
+    /**
+     * @return a value indicating the alarm seconds hand color.
+     */
+    public int getAlarmSecondsHandColor() {
+        return mAlarmModel.getAlarmSecondsHandColor();
+    }
+
+    /**
+     * @return a value indicating the alarm title color.
+     */
+    public int getAlarmTitleColor() {
+        return mAlarmModel.getAlarmTitleColor();
+    }
+
+    /**
+     * @return a value indicating the snooze button color.
+     */
+    public int getSnoozeButtonColor() {
+        return mAlarmModel.getSnoozeButtonColor();
+    }
+
+    /**
+     * @return a value indicating the dismiss button color.
+     */
+    public int getDismissButtonColor() {
+        return mAlarmModel.getDismissButtonColor();
+    }
+
+    /**
+     * @return a value indicating the alarm button color.
+     */
+    public int getAlarmButtonColor() {
+        return mAlarmModel.getAlarmButtonColor();
+    }
+
+    /**
+     * @return a value indicating the pulse color.
+     */
+    public int getPulseColor() {
+        return mAlarmModel.getPulseColor();
+    }
+
+    /**
+     * @return the font size applied to the alarm clock.
+     */
+    public String getAlarmClockFontSize() {
+        return mAlarmModel.getAlarmClockFontSize();
+    }
+
+    /**
+     * @return the font size applied to the alarm title.
+     */
+    public String getAlarmTitleFontSize() {
+        return mAlarmModel.getAlarmTitleFontSize();
+    }
+
+    /**
+     * @return {@code true} if the ringtone title should be displayed on the lock screen when the alarm is triggered.
+     * {@code false} otherwise.
+     */
+    public boolean isRingtoneTitleDisplayed() {
+        return mAlarmModel.isRingtoneTitleDisplayed();
     }
 
     /**
@@ -844,10 +1047,6 @@ public final class DataModel {
         return mSettingsModel.getGlobalIntentId();
     }
 
-    //
-    // Widgets
-    //
-
     /**
      * Update the id used to discriminate relevant AlarmManager callbacks from defunct ones
      */
@@ -873,6 +1072,21 @@ public final class DataModel {
     }
 
     /**
+     * @return {@code true} if auto night accent color is enabled. {@code false} otherwise.
+     */
+    public boolean isAutoNightAccentColorEnabled() {
+        return mSettingsModel.isAutoNightAccentColorEnabled();
+    }
+
+    /**
+     * @return the night accent color applied.
+     */
+    public String getNightAccentColor() {
+        enforceMainLooper();
+        return mSettingsModel.getNightAccentColor();
+    }
+
+    /**
      * @return the dark mode of the applied theme.
      */
     public String getDarkMode() {
@@ -889,11 +1103,11 @@ public final class DataModel {
     }
 
     /**
-     * @return whether or not the background border should be displayed in a view.
+     * @return whether or not the border should be displayed in a view.
      */
-    public boolean isCardBackgroundBorderDisplayed() {
+    public boolean isCardBorderDisplayed() {
         enforceMainLooper();
-        return mSettingsModel.isCardBackgroundBorderDisplayed();
+        return mSettingsModel.isCardBorderDisplayed();
     }
 
     /**
@@ -902,6 +1116,21 @@ public final class DataModel {
     public boolean isVibrationsEnabled() {
         enforceMainLooper();
         return mSettingsModel.isVibrationsEnabled();
+    }
+
+    /**
+     * @return whether or not the tab indicator is displayed in the bottom navigation menu.
+     */
+    public boolean isTabIndicatorDisplayed() {
+        return mSettingsModel.isTabIndicatorDisplayed();
+    }
+
+    /**
+     * @return whether or not the fade transitions are enabled.
+     */
+    public boolean isFadeTransitionsEnabled() {
+        enforceMainLooper();
+        return mSettingsModel.isFadeTransitionsEnabled();
     }
 
     /**
@@ -923,33 +1152,33 @@ public final class DataModel {
     /**
      * @return the dynamic colors of the clock to display in the screensaver
      */
-    public boolean getScreensaverClockDynamicColors() {
+    public boolean areScreensaverClockDynamicColors() {
         enforceMainLooper();
-        return mSettingsModel.getScreensaverClockDynamicColors();
+        return mSettingsModel.areScreensaverClockDynamicColors();
     }
 
     /**
      * @return the color of the clock to display in the screensaver
      */
-    public String getScreensaverClockPresetColors() {
+    public int getScreensaverClockColorPicker() {
         enforceMainLooper();
-        return mSettingsModel.getScreensaverClockPresetColors();
+        return mSettingsModel.getScreensaverClockColorPicker();
     }
 
     /**
      * @return the color of the date to display in the screensaver
      */
-    public String getScreensaverDatePresetColors() {
+    public int getScreensaverDateColorPicker() {
         enforceMainLooper();
-        return mSettingsModel.getScreensaverDatePresetColors();
+        return mSettingsModel.getScreensaverDateColorPicker();
     }
 
     /**
      * @return the color of the next alarm to display in the screensaver
      */
-    public String getScreensaverNextAlarmPresetColors() {
+    public int getScreensaverNextAlarmColorPicker() {
         enforceMainLooper();
-        return mSettingsModel.getScreensaverNextAlarmPresetColors();
+        return mSettingsModel.getScreensaverNextAlarmColorPicker();
     }
 
     /**
@@ -963,57 +1192,57 @@ public final class DataModel {
     /**
      * @return the style of clock to display in the clock application
      */
-    public boolean getDisplayScreensaverClockSeconds() {
+    public boolean areScreensaverClockSecondsDisplayed() {
         enforceMainLooper();
-        return mSettingsModel.getDisplayScreensaverClockSeconds();
+        return mSettingsModel.areScreensaverClockSecondsDisplayed();
     }
 
     /**
      * @return {@code true} if the screensaver should show the time in bold
      */
-    public boolean getScreensaverBoldDigitalClock() {
+    public boolean isScreensaverDigitalClockInBold() {
         enforceMainLooper();
-        return mSettingsModel.getScreensaverBoldDigitalClock();
+        return mSettingsModel.isScreensaverDigitalClockInBold();
     }
 
     /**
      * @return {@code true} if the screensaver should show the time in italic
      */
-    public boolean getScreensaverItalicDigitalClock() {
+    public boolean isScreensaverDigitalClockInItalic() {
         enforceMainLooper();
-        return mSettingsModel.getScreensaverItalicDigitalClock();
+        return mSettingsModel.isScreensaverDigitalClockInItalic();
     }
 
     /**
      * @return {@code true} if the screensaver should show the date in bold
      */
-    public boolean getScreensaverBoldDate() {
+    public boolean isScreensaverDateInBold() {
         enforceMainLooper();
-        return mSettingsModel.getScreensaverBoldDate();
+        return mSettingsModel.isScreensaverDateInBold();
     }
 
     /**
      * @return {@code true} if the screensaver should show the date in italic
      */
-    public boolean getScreensaverItalicDate() {
+    public boolean isScreensaverDateInItalic() {
         enforceMainLooper();
-        return mSettingsModel.getScreensaverItalicDate();
+        return mSettingsModel.isScreensaverDateInItalic();
     }
 
     /**
      * @return {@code true} if the screensaver should show the next alarm in bold
      */
-    public boolean getScreensaverBoldNextAlarm() {
+    public boolean isScreensaverNextAlarmInBold() {
         enforceMainLooper();
-        return mSettingsModel.getScreensaverBoldNextAlarm();
+        return mSettingsModel.isScreensaverNextAlarmInBold();
     }
 
     /**
      * @return {@code true} if the screensaver should show the next alarm in italic
      */
-    public boolean getScreensaverItalicNextAlarm() {
+    public boolean isScreensaverNextAlarmInItalic() {
         enforceMainLooper();
-        return mSettingsModel.getScreensaverItalicNextAlarm();
+        return mSettingsModel.isScreensaverNextAlarmInItalic();
     }
 
     /**
@@ -1042,6 +1271,14 @@ public final class DataModel {
     }
 
     /**
+     * @return {@code true} if swipe action is enabled to dismiss or snooze alarms. {@code false} otherwise.
+     */
+    public boolean isSwipeActionEnabled() {
+        enforceMainLooper();
+        return mSettingsModel.isSwipeActionEnabled();
+    }
+
+    /**
      * @return the display order of the weekdays, which can start with {@link Calendar#SATURDAY},
      * {@link Calendar#SUNDAY} or {@link Calendar#MONDAY}
      */
@@ -1065,11 +1302,526 @@ public final class DataModel {
     }
 
     /**
+     * @return the action to execute when volume up button is pressed for the stopwatch
+     */
+    public String getVolumeUpActionForStopwatch() {
+        enforceMainLooper();
+        return mSettingsModel.getVolumeUpActionForStopwatch();
+    }
+
+    /**
+     * @return the action to execute when volume up button is long pressed for the stopwatch
+     */
+    public String getVolumeUpActionAfterLongPressForStopwatch() {
+        enforceMainLooper();
+        return mSettingsModel.getVolumeUpActionAfterLongPressForStopwatch();
+    }
+
+    /**
+     * @return the action to execute when volume down button is pressed for the stopwatch
+     */
+    public String getVolumeDownActionForStopwatch() {
+        enforceMainLooper();
+        return mSettingsModel.getVolumeDownActionForStopwatch();
+    }
+
+    /**
+     * @return the action to execute when volume down button is long pressed for the stopwatch
+     */
+    public String getVolumeDownActionAfterLongPressForStopwatch() {
+        enforceMainLooper();
+        return mSettingsModel.getVolumeDownActionAfterLongPressForStopwatch();
+    }
+
+    /**
      * @return a description of the time zones available for selection
      */
     public TimeZones getTimeZones() {
         enforceMainLooper();
         return mSettingsModel.getTimeZones();
+    }
+
+    // ********************
+    // ** DIGITAL WIDGET **
+    // ********************
+
+    /**
+     * @return {@code true} if the background is displayed on the digital widget; {@code false} otherwise.
+     */
+    public boolean isBackgroundDisplayedOnDigitalWidget() {
+        return mWidgetModel.isBackgroundDisplayedOnDigitalWidget();
+    }
+
+    /**
+     * @return a value indicating the background color in the digital widget .
+     */
+    public int getDigitalWidgetBackgroundColor() {
+        return mWidgetModel.getDigitalWidgetBackgroundColor();
+    }
+
+    /**
+     * @return {@code true} if the cities are displayed on the digital widget; {@code false} otherwise.
+     */
+    public boolean areWorldCitiesDisplayedOnDigitalWidget() {
+        return mWidgetModel.areWorldCitiesDisplayedOnDigitalWidget();
+    }
+
+    /**
+     * @return the font size applied to the clock in the digital widget.
+     */
+    public String getDigitalWidgetMaxClockFontSize() {
+        return mWidgetModel.getDigitalWidgetMaxClockFontSize();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the clock in the digital widget; {@code false} otherwise.
+     */
+    public boolean isDigitalWidgetDefaultClockColor() {
+        return mWidgetModel.isDigitalWidgetDefaultClockColor();
+    }
+
+    /**
+     * @return a value indicating the color of the clock in the digital widget.
+     */
+    public int getDigitalWidgetCustomClockColor() {
+        return mWidgetModel.getDigitalWidgetCustomClockColor();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the date in the digital widget; {@code false} otherwise.
+     */
+    public boolean isDigitalWidgetDefaultDateColor() {
+        return mWidgetModel.isDigitalWidgetDefaultDateColor();
+    }
+
+    /**
+     * @return a value indicating the color of the date in the digital widget.
+     */
+    public int getDigitalWidgetCustomDateColor() {
+        return mWidgetModel.getDigitalWidgetCustomDateColor();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the next alarm in the digital widget;
+     * {@code false} otherwise.
+     */
+    public boolean isDigitalWidgetDefaultNextAlarmColor() {
+        return mWidgetModel.isDigitalWidgetDefaultNextAlarmColor();
+    }
+
+    /**
+     * @return a value indicating the color of the next alarm in the digital widget.
+     */
+    public int getDigitalWidgetCustomNextAlarmColor() {
+        return mWidgetModel.getDigitalWidgetCustomNextAlarmColor();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the city clock in the digital widget;
+     * {@code false} otherwise.
+     */
+    public boolean isDigitalWidgetDefaultCityClockColor() {
+        return mWidgetModel.isDigitalWidgetDefaultCityClockColor();
+    }
+
+    /**
+     * @return a value indicating the color of the city clock in the digital widget.
+     */
+    public int getDigitalWidgetCustomCityClockColor() {
+        return mWidgetModel.getDigitalWidgetCustomCityClockColor();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the city name in the digital widget;
+     * {@code false} otherwise.
+     */
+    public boolean isDigitalWidgetDefaultCityNameColor() {
+        return mWidgetModel.isDigitalWidgetDefaultCityNameColor();
+    }
+
+    /**
+     * @return a value indicating the color of the city name in the digital widget.
+     */
+    public int getDigitalWidgetCustomCityNameColor() {
+        return mWidgetModel.getDigitalWidgetCustomCityNameColor();
+    }
+
+    // *****************************
+    // ** VERTICAL DIGITAL WIDGET **
+    // *****************************
+
+    /**
+     * @return {@code true} if the background is displayed on the vertical digital widget; {@code false} otherwise.
+     */
+    public boolean isBackgroundDisplayedOnVerticalDigitalWidget() {
+        return mWidgetModel.isBackgroundDisplayedOnVerticalDigitalWidget();
+    }
+
+    /**
+     * @return a value indicating the background color in the vertical digital widget .
+     */
+    public int getVerticalDigitalWidgetBackgroundColor() {
+        return mWidgetModel.getVerticalDigitalWidgetBackgroundColor();
+    }
+
+    /**
+     * @return the font size applied to the hours in the vertical digital widget.
+     */
+    public String getVerticalDigitalWidgetMaxClockFontSize() {
+        return mWidgetModel.getVerticalDigitalWidgetMaxClockFontSize();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the hours in the vertical digital widget;
+     * {@code false} otherwise.
+     */
+    public boolean isVerticalDigitalWidgetDefaultHoursColor() {
+        return mWidgetModel.isVerticalDigitalWidgetDefaultHoursColor();
+    }
+
+    /**
+     * @return a value indicating the color of the hours in the vertical digital widget.
+     */
+    public int getVerticalDigitalWidgetCustomHoursColor() {
+        return mWidgetModel.getVerticalDigitalWidgetCustomHoursColor();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the minutes in the vertical digital widget;
+     * {@code false} otherwise.
+     */
+    public boolean isVerticalDigitalWidgetDefaultMinutesColor() {
+        return mWidgetModel.isVerticalDigitalWidgetDefaultMinutesColor();
+    }
+
+    /**
+     * @return a value indicating the color of the minutes in the vertical digital widget.
+     */
+    public int getVerticalDigitalWidgetCustomMinutesColor() {
+        return mWidgetModel.getVerticalDigitalWidgetCustomMinutesColor();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the date in the vertical digital widget;
+     * {@code false} otherwise.
+     */
+    public boolean isVerticalDigitalWidgetDefaultDateColor() {
+        return mWidgetModel.isVerticalDigitalWidgetDefaultDateColor();
+    }
+
+    /**
+     * @return a value indicating the color of the date in the vertical digital widget.
+     */
+    public int getVerticalDigitalWidgetCustomDateColor() {
+        return mWidgetModel.getVerticalDigitalWidgetCustomDateColor();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the next alarm in the vertical digital widget;
+     * {@code false} otherwise.
+     */
+    public boolean isVerticalDigitalWidgetDefaultNextAlarmColor() {
+        return mWidgetModel.isVerticalDigitalWidgetDefaultNextAlarmColor();
+    }
+
+    /**
+     * @return a value indicating the color of the next alarm in the vertical digital widget.
+     */
+    public int getVerticalDigitalWidgetCustomNextAlarmColor() {
+        return mWidgetModel.getVerticalDigitalWidgetCustomNextAlarmColor();
+    }
+
+    // ***********************
+    // ** NEXT ALARM WIDGET **
+    // ***********************
+
+    /**
+     * @return {@code true} if the background is displayed on the Next alarm widget; {@code false} otherwise.
+     */
+    public boolean isBackgroundDisplayedOnNextAlarmWidget() {
+        return mWidgetModel.isBackgroundDisplayedOnNextAlarmWidget();
+    }
+
+    /**
+     * @return a value indicating the background color in the Next alarm widget .
+     */
+    public int getNextAlarmWidgetBackgroundColor() {
+        return mWidgetModel.getNextAlarmWidgetBackgroundColor();
+    }
+
+    /**
+     * @return the font size applied to the Next alarm widget.
+     */
+    public String getNextAlarmWidgetMaxFontSize() {
+        return mWidgetModel.getNextAlarmWidgetMaxFontSize();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the title in the Next alarm widget;
+     * {@code false} otherwise.
+     */
+    public boolean isNextAlarmWidgetDefaultTitleColor() {
+        return mWidgetModel.isNextAlarmWidgetDefaultTitleColor();
+    }
+
+    /**
+     * @return a value indicating the color of the title in the Next alarm widget.
+     */
+    public int getNextAlarmWidgetCustomTitleColor() {
+        return mWidgetModel.getNextAlarmWidgetCustomTitleColor();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the alarm title in the Next alarm widget;
+     * {@code false} otherwise.
+     */
+    public boolean isNextAlarmWidgetDefaultAlarmTitleColor() {
+        return mWidgetModel.isNextAlarmWidgetDefaultAlarmTitleColor();
+    }
+
+    /**
+     * @return a value indicating the color of the alarm title in the Next alarm widget.
+     */
+    public int getNextAlarmWidgetCustomAlarmTitleColor() {
+        return mWidgetModel.getNextAlarmWidgetCustomAlarmTitleColor();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the alarm in the Next alarm widget;
+     * {@code false} otherwise.
+     */
+    public boolean isNextAlarmWidgetDefaultAlarmColor() {
+        return mWidgetModel.isNextAlarmWidgetDefaultAlarmColor();
+    }
+
+    /**
+     * @return a value indicating the color of the alarm in the Next alarm widget.
+     */
+    public int getNextAlarmWidgetCustomAlarmColor() {
+        return mWidgetModel.getNextAlarmWidgetCustomAlarmColor();
+    }
+
+    // *********************************
+    // ** MATERIAL YOU DIGITAL WIDGET **
+    // *********************************
+
+    /**
+     * @return {@code true} if the cities are displayed on the Material You digital widget;
+     * {@code false} otherwise.
+     */
+    public boolean areWorldCitiesDisplayedOnMaterialYouDigitalWidget() {
+        enforceMainLooper();
+        return mWidgetModel.areWorldCitiesDisplayedOnMaterialYouDigitalWidget();
+    }
+
+    /**
+     * @return the font size applied to the clock in the Material You digital widget.
+     */
+    public String getMaterialYouDigitalWidgetMaxClockFontSize() {
+        enforceMainLooper();
+        return mWidgetModel.getMaterialYouDigitalWidgetMaxClockFontSize();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the digital clock in the Material You widget;
+     * {@code false} otherwise.
+     */
+    public boolean isMaterialYouDigitalWidgetDefaultClockColor() {
+        return mWidgetModel.isMaterialYouDigitalWidgetDefaultClockColor();
+    }
+
+    /**
+     * @return a value indicating the color of the clock in the Material You digital widget.
+     */
+    public int getMaterialYouDigitalWidgetCustomClockColor() {
+        return mWidgetModel.getMaterialYouDigitalWidgetCustomClockColor();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the date in the Material You digital widget;
+     * {@code false} otherwise.
+     */
+    public boolean isMaterialYouDigitalWidgetDefaultDateColor() {
+        return mWidgetModel.isMaterialYouDigitalWidgetDefaultDateColor();
+    }
+
+    /**
+     * @return a value indicating the color of the date in the Material You digital widget.
+     */
+    public int getMaterialYouDigitalWidgetCustomDateColor() {
+        return mWidgetModel.getMaterialYouDigitalWidgetCustomDateColor();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the next alarm in the Material You digital widget;
+     * {@code false} otherwise.
+     */
+    public boolean isMaterialYouDigitalWidgetDefaultNextAlarmColor() {
+        return mWidgetModel.isMaterialYouDigitalWidgetDefaultNextAlarmColor();
+    }
+
+    /**
+     * @return a value indicating the color of the next alarm in the Material You digital widget.
+     */
+    public int getMaterialYouDigitalWidgetCustomNextAlarmColor() {
+        return mWidgetModel.getMaterialYouDigitalWidgetCustomNextAlarmColor();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the city clock in the Material You digital widget;
+     * {@code false} otherwise.
+     */
+    public boolean isMaterialYouDigitalWidgetDefaultCityClockColor() {
+        return mWidgetModel.isMaterialYouDigitalWidgetDefaultCityClockColor();
+    }
+
+    /**
+     * @return a value indicating the color of the city clock in the Material You digital widget.
+     */
+    public int getMaterialYouDigitalWidgetCustomCityClockColor() {
+        return mWidgetModel.getMaterialYouDigitalWidgetCustomCityClockColor();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the city name in the Material You digital widget;
+     * {@code false} otherwise.
+     */
+    public boolean isMaterialYouDigitalWidgetDefaultCityNameColor() {
+        return mWidgetModel.isMaterialYouDigitalWidgetDefaultCityNameColor();
+    }
+
+    /**
+     * @return a value indicating the color of the city name in the Material You digital widget.
+     */
+    public int getMaterialYouDigitalWidgetCustomCityNameColor() {
+        return mWidgetModel.getMaterialYouDigitalWidgetCustomCityNameColor();
+    }
+
+    // ******************************************
+    // ** MATERIAL YOU VERTICAL DIGITAL WIDGET **
+    // ******************************************
+
+    /**
+     * @return the font size applied to the hours in the Material You vertical digital widget.
+     */
+    public String getMaterialYouVerticalDigitalWidgetMaxClockFontSize() {
+        return mWidgetModel.getMaterialYouVerticalDigitalWidgetMaxClockFontSize();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the hours in the Material You vertical digital widget;
+     * {@code false} otherwise.
+     */
+    public boolean isMaterialYouVerticalDigitalWidgetDefaultHoursColor() {
+        return mWidgetModel.isMaterialYouVerticalDigitalWidgetDefaultHoursColor();
+    }
+
+    /**
+     * @return a value indicating the color of the hours in the Material You vertical digital widget.
+     */
+    public int getMaterialYouVerticalDigitalWidgetCustomHoursColor() {
+        return mWidgetModel.getMaterialYouVerticalDigitalWidgetCustomHoursColor();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the minutes in the Material You vertical digital widget;
+     * {@code false} otherwise.
+     */
+    public boolean isMaterialYouVerticalDigitalWidgetDefaultMinutesColor() {
+        return mWidgetModel.isMaterialYouVerticalDigitalWidgetDefaultMinutesColor();
+    }
+
+    /**
+     * @return a value indicating the color of the minutes in the Material You vertical digital widget.
+     */
+    public int getMaterialYouVerticalDigitalWidgetCustomMinutesColor() {
+        return mWidgetModel.getMaterialYouVerticalDigitalWidgetCustomMinutesColor();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the date in the Material You vertical digital widget;
+     * {@code false} otherwise.
+     */
+    public boolean isMaterialYouVerticalDigitalWidgetDefaultDateColor() {
+        return mWidgetModel.isMaterialYouVerticalDigitalWidgetDefaultDateColor();
+    }
+
+    /**
+     * @return a value indicating the color of the date in the Material You vertical digital widget.
+     */
+    public int getMaterialYouVerticalDigitalWidgetCustomDateColor() {
+        return mWidgetModel.getMaterialYouVerticalDigitalWidgetCustomDateColor();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the next alarm in the Material You vertical digital widget;
+     * {@code false} otherwise.
+     */
+    public boolean isMaterialYouVerticalDigitalWidgetDefaultNextAlarmColor() {
+        return mWidgetModel.isMaterialYouVerticalDigitalWidgetDefaultNextAlarmColor();
+    }
+
+    /**
+     * @return a value indicating the color of the next alarm in the Material You vertical digital widget.
+     */
+    public int getMaterialYouVerticalDigitalWidgetCustomNextAlarmColor() {
+        return mWidgetModel.getMaterialYouVerticalDigitalWidgetCustomNextAlarmColor();
+    }
+
+    // ************************************
+    // ** MATERIAL YOU NEXT ALARM WIDGET **
+    // ************************************
+
+    /**
+     * @return the font size applied to the Material You Next alarm widget.
+     */
+    public String getMaterialYouNextAlarmWidgetMaxFontSize() {
+        return mWidgetModel.getMaterialYouNextAlarmWidgetMaxFontSize();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the title in the Material You Next alarm widget;
+     * {@code false} otherwise.
+     */
+    public boolean isMaterialYouNextAlarmWidgetDefaultTitleColor() {
+        return mWidgetModel.isMaterialYouNextAlarmWidgetDefaultTitleColor();
+    }
+
+    /**
+     * @return a value indicating the color of the title in the Material You Next alarm widget.
+     */
+    public int getMaterialYouNextAlarmWidgetCustomTitleColor() {
+        return mWidgetModel.getMaterialYouNextAlarmWidgetCustomTitleColor();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the alarm title in the Material You Next alarm widget;
+     * {@code false} otherwise.
+     */
+    public boolean isMaterialYouNextAlarmWidgetDefaultAlarmTitleColor() {
+        return mWidgetModel.isMaterialYouNextAlarmWidgetDefaultAlarmTitleColor();
+    }
+
+    /**
+     * @return a value indicating the color of the alarm title in the Material You Next alarm widget.
+     */
+    public int getMaterialYouNextAlarmWidgetCustomAlarmTitleColor() {
+        return mWidgetModel.getMaterialYouNextAlarmWidgetCustomAlarmTitleColor();
+    }
+
+    /**
+     * @return {@code true} if the default color is applied to the alarm in the Material You Next alarm widget;
+     * {@code false} otherwise.
+     */
+    public boolean isMaterialYouNextAlarmWidgetDefaultAlarmColor() {
+        return mWidgetModel.isMaterialYouNextAlarmWidgetDefaultAlarmColor();
+    }
+
+    /**
+     * @return a value indicating the color of the alarm in the Material You Next alarm widget.
+     */
+    public int getMaterialYouNextAlarmWidgetCustomAlarmColor() {
+        return mWidgetModel.getMaterialYouNextAlarmWidgetCustomAlarmColor();
     }
 
     /**
@@ -1083,9 +1835,14 @@ public final class DataModel {
     public enum CitySort {NAME, UTC_OFFSET}
 
     /**
-     * Indicates the preferred behavior of hardware volume buttons when firing alarms.
+     * Indicates the preferred behavior of power button when firing alarms.
      */
-    public enum AlarmVolumeButtonBehavior {NOTHING, SNOOZE, DISMISS}
+    public enum PowerButtonBehavior {NOTHING, SNOOZE, DISMISS}
+
+    /**
+     * Indicates the preferred behavior of volume button when firing alarms.
+     */
+    public enum VolumeButtonBehavior {CHANGE_VOLUME, SNOOZE_ALARM, DISMISS_ALARM, DO_NOTHING}
 
     /**
      * Indicates the reason alarms may not fire or may fire silently.

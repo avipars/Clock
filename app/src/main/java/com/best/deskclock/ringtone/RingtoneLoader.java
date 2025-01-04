@@ -7,21 +7,20 @@
 package com.best.deskclock.ringtone;
 
 import static android.media.AudioManager.STREAM_ALARM;
-import static com.best.deskclock.Utils.RINGTONE_SILENT;
+import static com.best.deskclock.utils.Utils.RINGTONE_SILENT;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.MatrixCursor;
 import android.media.RingtoneManager;
 import android.net.Uri;
 
 import androidx.loader.content.AsyncTaskLoader;
 
 import com.best.deskclock.ItemAdapter;
-import com.best.deskclock.LogUtils;
 import com.best.deskclock.R;
 import com.best.deskclock.data.CustomRingtone;
 import com.best.deskclock.data.DataModel;
+import com.best.deskclock.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,46 +58,44 @@ class RingtoneLoader extends AsyncTaskLoader<List<ItemAdapter.ItemHolder<Uri>>> 
         final RingtoneManager ringtoneManager = new RingtoneManager(getContext());
         ringtoneManager.setType(STREAM_ALARM);
 
-        Cursor systemRingtoneCursor;
-        try {
-            systemRingtoneCursor = ringtoneManager.getCursor();
+        try (Cursor systemRingtoneCursor = ringtoneManager.getCursor()) {
+            final int systemRingtoneCount = systemRingtoneCursor.getCount();
+            // item count = # system ringtones + # custom ringtones + 2 headers + Add new music item
+            final int itemCount = systemRingtoneCount + mCustomRingtones.size() + 3;
+
+            final List<ItemAdapter.ItemHolder<Uri>> itemHolders = new ArrayList<>(itemCount);
+
+            // Add the item holder for the Music heading.
+            itemHolders.add(new HeaderHolder(R.string.your_sounds));
+
+            // Add an item holder for each custom ringtone and also cache a pretty name.
+            for (CustomRingtone ringtone : mCustomRingtones) {
+                itemHolders.add(new CustomRingtoneHolder(ringtone));
+            }
+
+            // Add an item holder for the "Add new" music ringtone.
+            itemHolders.add(new AddCustomRingtoneHolder());
+
+            // Add an item holder for the Ringtones heading.
+            itemHolders.add(new HeaderHolder(R.string.device_sounds));
+
+            // Add an item holder for the silent ringtone.
+            itemHolders.add(new SystemRingtoneHolder(RINGTONE_SILENT, null));
+
+            // Add an item holder for the system default alarm sound.
+            itemHolders.add(new SystemRingtoneHolder(mDefaultRingtoneUri, mDefaultRingtoneTitle));
+
+            // Add an item holder for each system ringtone.
+            for (int i = 0; i < systemRingtoneCount; i++) {
+                final Uri ringtoneUri = ringtoneManager.getRingtoneUri(i);
+                itemHolders.add(new SystemRingtoneHolder(ringtoneUri, null));
+            }
+
+            return itemHolders;
         } catch (Exception e) {
             LogUtils.e("Could not get system ringtone cursor");
-            systemRingtoneCursor = new MatrixCursor(new String[]{});
+            return new ArrayList<>();
         }
-        final int systemRingtoneCount = systemRingtoneCursor.getCount();
-        // item count = # system ringtones + # custom ringtones + 2 headers + Add new music item
-        final int itemCount = systemRingtoneCount + mCustomRingtones.size() + 3;
-
-        final List<ItemAdapter.ItemHolder<Uri>> itemHolders = new ArrayList<>(itemCount);
-
-        // Add the item holder for the Music heading.
-        itemHolders.add(new HeaderHolder(R.string.your_sounds));
-
-        // Add an item holder for each custom ringtone and also cache a pretty name.
-        for (CustomRingtone ringtone : mCustomRingtones) {
-            itemHolders.add(new CustomRingtoneHolder(ringtone));
-        }
-
-        // Add an item holder for the "Add new" music ringtone.
-        itemHolders.add(new AddCustomRingtoneHolder());
-
-        // Add an item holder for the Ringtones heading.
-        itemHolders.add(new HeaderHolder(R.string.device_sounds));
-
-        // Add an item holder for the silent ringtone.
-        itemHolders.add(new SystemRingtoneHolder(RINGTONE_SILENT, null));
-
-        // Add an item holder for the system default alarm sound.
-        itemHolders.add(new SystemRingtoneHolder(mDefaultRingtoneUri, mDefaultRingtoneTitle));
-
-        // Add an item holder for each system ringtone.
-        for (int i = 0; i < systemRingtoneCount; i++) {
-            final Uri ringtoneUri = ringtoneManager.getRingtoneUri(i);
-            itemHolders.add(new SystemRingtoneHolder(ringtoneUri, null));
-        }
-
-        return itemHolders;
     }
 
     @Override

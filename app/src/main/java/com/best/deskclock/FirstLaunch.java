@@ -30,8 +30,6 @@ public class FirstLaunch extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getWindow().setNavigationBarColor(getColor(R.color.md_theme_background));
-
         setContentView(R.layout.first_launch_activity);
 
         mAppTitle = findViewById(R.id.first_launch_app_title);
@@ -40,8 +38,6 @@ public class FirstLaunch extends AppCompatActivity {
         mImportantInfoText = findViewById(R.id.first_launch_important_info_text);
         mNowButton = findViewById(R.id.now_button);
         mLaterButton = findViewById(R.id.later_button);
-
-        isFirstLaunch();
 
         setupTitle();
 
@@ -70,11 +66,6 @@ public class FirstLaunch extends AppCompatActivity {
                 showDialogToQuit();
             }
         });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 
     /**
@@ -132,17 +123,6 @@ public class FirstLaunch extends AppCompatActivity {
         }
         Spanned importantInfoMessage = Html.fromHtml(getString(R.string.first_launch_important_info_message, android14message));
         mImportantInfoText.setText(importantInfoMessage);
-    }
-
-    /**
-     * Check if this is the first time the application has been launched.
-     */
-    private void isFirstLaunch() {
-        final boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE).getBoolean("isFirstRun", true);
-        if (!isFirstRun) {
-            startActivity(new Intent(this, DeskClock.class));
-            finish();
-        }
     }
 
 }

@@ -1,12 +1,14 @@
+<!--suppress CheckImageSize -->
 # Clock
 Clock is a privacy-conscious open-source clock, based on AOSP Clock.
 
 [<img src="/images/badge_github.png" alt="Get it on GitHub" height="80">](https://github.com/BlackyHawky/Clock/releases)
-[<img src="/images/badge-f-droid.png" alt="Get it on F-Droid" height="80">](https://f-droid.org/packages/com.best.deskclock/)
+[<img src="/images/badge_f-droid.png" alt="Get it on F-Droid" height="80">](https://f-droid.org/packages/com.best.deskclock/)
+[<img src="/images/badge_izzy_on_droid.png" alt="Get it on IzzyOnDroid" height="80">](https://apt.izzysoft.de/fdroid/index/apk/com.best.deskclock/)
 
 ## Table of Contents
 
-- [Features](#features-)
+- [Features](#features)
   * [Common Issues](#common-issues)
 - [Contributing](#contributing-)
   * [Reporting Issues](#reporting-issues)
@@ -16,10 +18,11 @@ Clock is a privacy-conscious open-source clock, based on AOSP Clock.
 - [Screenshots](#screenshots)
 - [Credits](#credits)
 
-# Features : 
+# Features
 * Flip and shake action to dismiss/postpone alarm;
 * Turn off/postpone the alarm with the power button or volume buttons;
-* For Snapdragon phones only, the alarm is triggered when the phone is switched off;
+* For some Snapdragon devices only, the alarm is triggered when they are switched off;
+  * Unfortunately, this feature may not work on some devices despite the presence of the _“com.qualcomm.qti.poweroffalarm”_ system app. See the discussion [here](https://github.com/BlackyHawky/Clock/issues/88).
 * Swipe to delete an alarm;
 * Duplicate alarms;
 * Customizable alarm title;
@@ -34,14 +37,17 @@ Clock is a privacy-conscious open-source clock, based on AOSP Clock.
 * Customizable interface;
 * Customizable screensaver;
 * Modern widgets;
+* Customizable widgets;
+* Backup and restore settings;
 * Material design;
 * Dynamic colors for Android 12+;
+* Support for [Reproducible Builds](https://reproducible-builds.org/). See the discussion [here](https://github.com/BlackyHawky/Clock/issues/140).
 
 ## Common Issues
-* Problem encountered when displaying times in bedtime mode notifications;
+* Problem encountered with bedtime mode as this is an experimental feature;
 * Maybe other things, but nothing about the alarm's functionality.
 
-_<b>As I'm not an expert developer, some problems may unfortunately not be solved without help.</b>_
+⚠ _<b>As I'm not an expert developer, some problems may unfortunately not be solved without help.</b>_ ⚠
 
 # Contributing ❤
 
@@ -53,11 +59,18 @@ Before opening a new issue, be sure to check the following:
 - **Does the issue already exist?** Make sure a similar issue has not been reported by browsing [existing issues](https://github.com/BlackyHawky/Clock/issues). Please search open and closed issues.
 - **Is the issue still relevant?** Make sure your issue is not already fixed in the latest version of Clock.
 - **Did you use the issue template?** It is important to make life of our kind contributors easier by avoiding issues that miss key information to their resolution.
-  Note that issues that that ignore part of the issue template will likely get treated with very low priority, as often they are needlessly hard to read or understand (e.g. huge screenshots, or addressing multiple topics).
+  Note that issues that ignore part of the issue template will likely get treated with very low priority, as often they are needlessly hard to read or understand (e.g. huge screenshots, or addressing multiple topics).
 
 ## Translation
 Translations can be added using [Weblate](https://translate.codeberg.org/projects/clock/). You will need an account to update translations and add languages. Add the language you want to translate to in Languages -> Manage translated languages in the top menu bar.
 Updating translations in a PR will not be accepted, as it may cause conflicts with Weblate translations.
+
+<details>
+<summary><b>Click here to see the translation status</b></summary>
+<br>
+
+[![Translation status](https://translate.codeberg.org/widget/clock/clock/multi-auto.svg)](https://translate.codeberg.org/engage/clock/)
+</details>
 
 ## Code Contribution
 
@@ -71,7 +84,7 @@ Once everything is up correctly, you're ready to go!
 ### Guidelines
 
 Clock is a complex application, when contributing, you must take a step back and make sure your contribution:
-- **Is actually wanted**. Best check related open issues before you start working on a PR. Issues with "PR" and "contributor needed" labels are accepted, but still it would be good if you announced that you are working on it.
+- **Is actually wanted**. Best check related open issues before you start working on a PR. Issues with "help wanted" label are accepted, but still it would be good if you announced that you are working on it.
   If there is no issue related to your intended contribution, it's a good idea to open a new one to avoid disappointment of the contribution not being accepted. For small changes or fixing obvious bugs this step is not necessary.
 - **Is only about a single thing**. Mixing unrelated contributions into a single PR is hard to review and can get messy.
 - **Has a proper description**. What your contribution does is usually less obvious to reviewers than for yourself. A good description helps a lot for understanding what is going on, and for separating wanted from unintended changes in behavior.
@@ -96,18 +109,20 @@ Since the app is based on Apache 2.0 licensed AOSP Clock, an [Apache 2.0](LICENS
 <details>
 <summary><b>Click here to see screenshots</b></summary>
 <br>
- <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/01.jpg" alt="Screenshot 1" width="200" />
- <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/02.jpg" alt="Screenshot 2" width="200" />
- <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/03.jpg" alt="Screenshot 3" width="200" />
- <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/04.jpg" alt="Screenshot 4" width="200" />
- <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/05.jpg" alt="Screenshot 5" width="200" />
- <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/06.jpg" alt="Screenshot 6" width="200" />
- <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/07.jpg" alt="Screenshot 7" width="200" />
- <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/08.jpg" alt="Screenshot 8" width="200" />
- <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/09.jpg" alt="Screenshot 8" width="200" />
- <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/10.jpg" alt="Screenshot 8" width="200" />
- <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/11.jpg" alt="Screenshot 8" width="200" />
- <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/12.jpg" alt="Screenshot 8" width="200" />
+ <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/01.jpg" alt="Screenshot 01" width="200" />
+ <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/02.jpg" alt="Screenshot 02" width="200" />
+ <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/03.jpg" alt="Screenshot 03" width="200" />
+ <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/04.jpg" alt="Screenshot 04" width="200" />
+ <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/05.jpg" alt="Screenshot 05" width="200" />
+ <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/06.jpg" alt="Screenshot 06" width="200" />
+ <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/07.jpg" alt="Screenshot 07" width="200" />
+ <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/08.jpg" alt="Screenshot 08" width="200" />
+ <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/09.jpg" alt="Screenshot 09" width="200" />
+ <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/10.jpg" alt="Screenshot 10" width="200" />
+ <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/11.jpg" alt="Screenshot 11" width="200" />
+ <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/12.jpg" alt="Screenshot 12" width="200" />
+ <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/13.jpg" alt="Screenshot 13" width="200" />
+ <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/14.jpg" alt="Screenshot 14" width="200" />
 </details>
 
 # Credits

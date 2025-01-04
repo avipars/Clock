@@ -12,7 +12,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="10dp"
-    android:layout_marginVertical="5dp"
+    android:layout_marginVertical="4dp"
     app:strokeWidth="0dp">
 
     <LinearLayout
@@ -50,7 +50,6 @@
                     android:layout_height="wrap_content"
                     android:singleLine="true"
                     android:textSize="16sp"
-                    android:textColor="?android:attr/textColorPrimary"
                     android:fontFamily="sans-serif-medium"
                     android:ellipsize="marquee"
                     android:text="@null"
@@ -66,7 +65,6 @@
                     android:textAlignment="viewStart"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="?android:attr/textColorSecondary"
-                    android:maxLines="4"
                     tools:text="40%" />
 
             </RelativeLayout>

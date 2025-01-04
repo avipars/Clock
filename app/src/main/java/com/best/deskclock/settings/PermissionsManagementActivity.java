@@ -3,8 +3,6 @@
 package com.best.deskclock.settings;
 
 import static android.Manifest.permission.POST_NOTIFICATIONS;
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static android.Manifest.permission.READ_MEDIA_AUDIO;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS;
 import static android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS;
@@ -12,6 +10,8 @@ import static android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTI
 import static android.provider.Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT;
 import static android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS;
 import static android.provider.Settings.EXTRA_APP_PACKAGE;
+
+import static com.best.deskclock.DeskClock.REQUEST_CHANGE_PERMISSIONS;
 
 import android.annotation.SuppressLint;
 import android.app.NotificationManager;
@@ -31,35 +31,36 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.best.deskclock.R;
+import com.best.deskclock.data.DataModel;
+import com.best.deskclock.utils.Utils;
 import com.best.deskclock.widget.CollapsingToolbarBaseActivity;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.color.MaterialColors;
 
 public class PermissionsManagementActivity extends CollapsingToolbarBaseActivity {
 
     MaterialCardView mIgnoreBatteryOptimizationsView;
     MaterialCardView mNotificationView;
     MaterialCardView mFullScreenNotificationsView;
-    MaterialCardView mStorageView;
 
     ImageView mIgnoreBatteryOptimizationsDetails;
     ImageView mNotificationDetails;
     ImageView mFullScreenNotificationsDetails;
-    ImageView mStorageDetails;
 
     TextView mIgnoreBatteryOptimizationsStatus;
     TextView mNotificationStatus;
     TextView mFullScreenNotificationsStatus;
-    TextView mStorageStatus;
 
     private static final String PERMISSION_POWER_OFF_ALARM = "org.codeaurora.permission.POWER_OFF_ALARM";
-
-    private int clickCountOnStorageButton = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.permissions_management_activity);
+
+        final boolean isCardBackgroundDisplayed = DataModel.getDataModel().isCardBackgroundDisplayed();
+        final boolean isCardBorderDisplayed = DataModel.getDataModel().isCardBorderDisplayed();
 
         mIgnoreBatteryOptimizationsView = findViewById(R.id.IBO_view);
         mIgnoreBatteryOptimizationsView.setOnClickListener(v -> launchIgnoreBatteryOptimizationsSettings());
@@ -85,6 +86,31 @@ public class PermissionsManagementActivity extends CollapsingToolbarBaseActivity
         );
         mNotificationStatus = findViewById(R.id.notification_status_text);
 
+        if (isCardBackgroundDisplayed) {
+            mIgnoreBatteryOptimizationsView.setCardBackgroundColor(
+                    MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, Color.BLACK)
+            );
+            mNotificationView.setCardBackgroundColor(
+                    MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, Color.BLACK)
+            );
+
+        } else {
+            mIgnoreBatteryOptimizationsView.setCardBackgroundColor(Color.TRANSPARENT);
+            mNotificationView.setCardBackgroundColor(Color.TRANSPARENT);
+        }
+
+        if (isCardBorderDisplayed) {
+            mIgnoreBatteryOptimizationsView.setStrokeWidth(Utils.toPixel(2, this));
+            mIgnoreBatteryOptimizationsView.setStrokeColor(
+                    MaterialColors.getColor(this, com.google.android.material.R.attr.colorPrimary, Color.BLACK)
+            );
+
+            mNotificationView.setStrokeWidth(Utils.toPixel(2, this));
+            mNotificationView.setStrokeColor(
+                    MaterialColors.getColor(this, com.google.android.material.R.attr.colorPrimary, Color.BLACK)
+            );
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             mFullScreenNotificationsView = findViewById(R.id.FSN_view);
             mFullScreenNotificationsView.setVisibility(View.VISIBLE);
@@ -98,39 +124,23 @@ public class PermissionsManagementActivity extends CollapsingToolbarBaseActivity
                             .show()
             );
             mFullScreenNotificationsStatus = findViewById(R.id.FSN_status_text);
-        }
 
-        mStorageView = findViewById(R.id.storage_view);
-        mStorageView.setOnClickListener(v -> {
-            /* If the user refuses authorization in the system dialog, Android will not allow
-            this authorization request dialog to be created again.
-            We therefore need to know how many times the button is clicked in order to display
-            an alert dialog to access the storage settings. */
-            clickCountOnStorageButton = clickCountOnStorageButton + 1;
-            if (clickCountOnStorageButton > 1 && !isStoragePermissionsGranted(this)) {
-                Intent intent = new Intent(ACTION_APPLICATION_DETAILS_SETTINGS)
-                        .setData(Uri.fromParts("package", getPackageName(), null)).addFlags(FLAG_ACTIVITY_NEW_TASK);
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.storage_permission_dialog_title)
-                        .setMessage(R.string.storage_permission_dialog_message)
-                        .setPositiveButton(android.R.string.yes, (dialog, which) -> startActivity(intent))
-                        .setNegativeButton(android.R.string.cancel, null)
-                        .show();
-
+            if (isCardBackgroundDisplayed) {
+                mFullScreenNotificationsView.setCardBackgroundColor(
+                        MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, Color.BLACK)
+                );
             } else {
-                grantOrRevokeStoragePermission();
+                mFullScreenNotificationsView.setCardBackgroundColor(Color.TRANSPARENT);
             }
 
-        });
-        mStorageDetails = findViewById(R.id.storage_details_button);
-        mStorageDetails.setOnClickListener(v ->
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.storage_dialog_title)
-                        .setMessage(R.string.storage_dialog_text)
-                        .setPositiveButton(R.string.permission_dialog_close_button, null)
-                        .show()
-        );
-        mStorageStatus = findViewById(R.id.storage_status_text);
+            if (isCardBorderDisplayed) {
+                mFullScreenNotificationsView.setStrokeWidth(Utils.toPixel(2, this));
+                mFullScreenNotificationsView.setStrokeColor(
+                        MaterialColors.getColor(this, com.google.android.material.R.attr.colorPrimary, Color.BLACK)
+                );
+            }
+
+        }
 
         grantPowerOffPermission();
     }
@@ -154,11 +164,15 @@ public class PermissionsManagementActivity extends CollapsingToolbarBaseActivity
 
         if (!isIgnoringBatteryOptimizations(this)) {
             startActivity(intentGrant);
+            setResult(REQUEST_CHANGE_PERMISSIONS);
         } else {
             new AlertDialog.Builder(this)
                     .setTitle(R.string.permission_dialog_revoke_title)
                     .setMessage(R.string.revoke_permission_dialog_message)
-                    .setPositiveButton(android.R.string.yes, (dialog, which) -> startActivity(intentRevoke))
+                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                        startActivity(intentRevoke);
+                        setResult(REQUEST_CHANGE_PERMISSIONS);
+                    })
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
         }
@@ -178,7 +192,10 @@ public class PermissionsManagementActivity extends CollapsingToolbarBaseActivity
             new AlertDialog.Builder(this)
                     .setTitle(R.string.permission_dialog_revoke_title)
                     .setMessage(R.string.revoke_permission_dialog_message)
-                    .setPositiveButton(android.R.string.yes, (dialog, which) -> startActivity(intent))
+                    .setPositiveButton(android.R.string.yes, (dialog, which) ->{
+                        startActivity(intent);
+                        setResult(REQUEST_CHANGE_PERMISSIONS);
+                    })
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
         } else {
@@ -188,6 +205,7 @@ public class PermissionsManagementActivity extends CollapsingToolbarBaseActivity
             } else {
                 startActivity(intent);
             }
+            setResult(REQUEST_CHANGE_PERMISSIONS);
         }
     }
 
@@ -201,40 +219,18 @@ public class PermissionsManagementActivity extends CollapsingToolbarBaseActivity
 
             if (!areFullScreenNotificationsEnabled(this)) {
                 startActivity(intent);
+                setResult(REQUEST_CHANGE_PERMISSIONS);
             } else {
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.permission_dialog_revoke_title)
                         .setMessage(R.string.revoke_permission_dialog_message)
-                        .setPositiveButton(android.R.string.yes, (dialog, which) -> startActivity(intent))
+                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                            startActivity(intent);
+                            setResult(REQUEST_CHANGE_PERMISSIONS);
+                        })
                         .setNegativeButton(android.R.string.cancel, null)
                         .show();
             }
-        }
-    }
-
-    /**
-     * Grant or revoke Storage permission
-     */
-    private void grantOrRevokeStoragePermission() {
-        int codeForStorage = 0;
-        String storagePermissions;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            storagePermissions = READ_MEDIA_AUDIO;
-        } else {
-            storagePermissions = READ_EXTERNAL_STORAGE;
-        }
-
-        if (checkSelfPermission(storagePermissions) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{storagePermissions}, codeForStorage);
-        } else {
-            Intent intent = new Intent(ACTION_APPLICATION_DETAILS_SETTINGS)
-                    .setData(Uri.fromParts("package", getPackageName(), null)).addFlags(FLAG_ACTIVITY_NEW_TASK);
-            new AlertDialog.Builder(this)
-                    .setTitle(R.string.permission_dialog_revoke_title)
-                    .setMessage(R.string.revoke_permission_dialog_message)
-                    .setPositiveButton(android.R.string.yes, (dialog, which) -> startActivity(intent))
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .show();
         }
     }
 
@@ -256,31 +252,24 @@ public class PermissionsManagementActivity extends CollapsingToolbarBaseActivity
                 ? R.string.permission_granted
                 : R.string.permission_denied);
         mIgnoreBatteryOptimizationsStatus.setTextColor(isIgnoringBatteryOptimizations(this)
-                ? Color.parseColor("#66BB6A")
-                : Color.parseColor("#EF5350"));
+                ? this.getColor(R.color.colorGranted)
+                : this.getColor(R.color.colorAlert));
 
         mNotificationStatus.setText(areNotificationsEnabled(this)
                 ? R.string.permission_granted
                 : R.string.permission_denied);
         mNotificationStatus.setTextColor(areNotificationsEnabled(this)
-                ? Color.parseColor("#66BB6A")
-                : Color.parseColor("#EF5350"));
+                ? this.getColor(R.color.colorGranted)
+                : this.getColor(R.color.colorAlert));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             mFullScreenNotificationsStatus.setText(areFullScreenNotificationsEnabled(this)
                     ? R.string.permission_granted
                     : R.string.permission_denied);
             mFullScreenNotificationsStatus.setTextColor(areFullScreenNotificationsEnabled(this)
-                    ? Color.parseColor("#66BB6A")
-                    : Color.parseColor("#EF5350"));
+                    ? this.getColor(R.color.colorGranted)
+                    : this.getColor(R.color.colorAlert));
         }
-
-        mStorageStatus.setText(isStoragePermissionsGranted(this)
-                ? R.string.permission_granted
-                : R.string.permission_denied);
-        mStorageStatus.setTextColor(isStoragePermissionsGranted(this)
-                ? Color.parseColor("#66BB6A")
-                : Color.parseColor("#EF5350"));
     }
 
     /**
@@ -307,16 +296,6 @@ public class PermissionsManagementActivity extends CollapsingToolbarBaseActivity
             return notificationManager.canUseFullScreenIntent();
         }
         return false;
-    }
-
-    /**
-     * @return {@code true} when Storage permission is granted; {@code false} otherwise
-     */
-    public static boolean isStoragePermissionsGranted(Context context) {
-        int granted = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-                ? context.checkSelfPermission(READ_MEDIA_AUDIO)
-                : context.checkSelfPermission(READ_EXTERNAL_STORAGE);
-        return granted == PackageManager.PERMISSION_GRANTED;
     }
 
     /**

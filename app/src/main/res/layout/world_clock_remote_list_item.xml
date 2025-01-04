@@ -8,7 +8,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/widget_item"
+    android:id="@+id/widgetItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -26,20 +26,23 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
+            <!-- A horizontal padding is added because on some devices
+            the text shadow is cut off. -->
             <TextClock
-                android:id="@+id/left_clock"
+                android:id="@+id/leftClock"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:paddingHorizontal="3dp"
                 android:baselineAligned="true"
                 android:gravity="center"
-                android:textColor="@android:color/white"
                 android:shadowRadius="2.75"
                 android:shadowColor="@android:color/black"
                 android:shadowDx="2"
                 android:shadowDy="2"
                 tools:text="01:23 AM"
-                tools:textSize="16sp" />
+                tools:textSize="16sp"
+                tools:textColor="@android:color/white" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -52,41 +55,45 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1">
 
+                    <!-- A horizontal padding is added because on some devices
+                    the text shadow is cut off. -->
                     <TextView
-                        android:id="@+id/city_name_left"
+                        android:id="@+id/cityNameLeft"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end"
+                        android:paddingHorizontal="3dp"
                         android:ellipsize="end"
                         android:includeFontPadding="false"
-                        android:singleLine="true"
+                        android:maxLines="1"
                         android:textAllCaps="true"
-                        android:textColor="@android:color/white"
                         android:shadowRadius="2.75"
                         android:shadowColor="@android:color/black"
                         android:shadowDx="2"
                         android:shadowDy="2"
-                        tools:text="City1" />
+                        tools:text="City1"
+                        tools:textColor="@android:color/white" />
 
                 </FrameLayout>
 
+                <!-- A horizontal padding is added because on some devices
+                the text shadow is cut off. -->
                 <TextView
-                    android:id="@+id/city_day_left"
+                    android:id="@+id/cityDayLeft"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
+                    android:paddingHorizontal="3dp"
                     android:ellipsize="none"
                     android:format12Hour="@string/abbrev_wday"
                     android:format24Hour="@string/abbrev_wday"
                     android:includeFontPadding="false"
-                    android:singleLine="true"
+                    android:maxLines="1"
                     android:textAllCaps="true"
-                    android:textColor="@android:color/white"
                     android:shadowRadius="2.75"
                     android:shadowColor="@android:color/black"
                     android:shadowDx="2"
                     android:shadowDy="2"
-                    tools:text="/ Mon" />
+                    tools:text="/ Mon"
+                    tools:textColor="@android:color/white" />
 
             </LinearLayout>
 
@@ -99,20 +106,23 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
+            <!-- A horizontal padding is added because on some devices
+            the text shadow is cut off. -->
             <TextClock
-                android:id="@+id/right_clock"
+                android:id="@+id/rightClock"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingHorizontal="3dp"
                 android:layout_gravity="center"
                 android:baselineAligned="true"
                 android:gravity="center"
-                android:textColor="@android:color/white"
                 android:shadowRadius="2.75"
                 android:shadowColor="@android:color/black"
                 android:shadowDx="2"
                 android:shadowDy="2"
                 tools:text="01:23 AM"
-                tools:textSize="16sp" />
+                tools:textSize="16sp"
+                tools:textColor="@android:color/white" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -125,41 +135,45 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1">
 
+                    <!-- A horizontal padding is added because on some devices
+                    the text shadow is cut off. -->
                     <TextView
-                        android:id="@+id/city_name_right"
+                        android:id="@+id/cityNameRight"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end"
+                        android:paddingHorizontal="3dp"
                         android:ellipsize="end"
                         android:includeFontPadding="false"
-                        android:singleLine="true"
+                        android:maxLines="1"
                         android:textAllCaps="true"
-                        android:textColor="@android:color/white"
                         android:shadowRadius="2.75"
                         android:shadowColor="@android:color/black"
                         android:shadowDx="2"
                         android:shadowDy="2"
-                        tools:text="City 2" />
+                        tools:text="City 2"
+                        tools:textColor="@android:color/white" />
 
                 </FrameLayout>
 
+                <!-- A horizontal padding is added because on some devices
+                the text shadow is cut off. -->
                 <TextView
-                    android:id="@+id/city_day_right"
+                    android:id="@+id/cityDayRight"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
+                    android:paddingHorizontal="3dp"
                     android:ellipsize="none"
                     android:format12Hour="@string/abbrev_wday"
                     android:format24Hour="@string/abbrev_wday"
                     android:includeFontPadding="false"
-                    android:singleLine="true"
+                    android:maxLines="1"
                     android:textAllCaps="true"
-                    android:textColor="@android:color/white"
                     android:shadowRadius="2.75"
                     android:shadowColor="@android:color/black"
                     android:shadowDx="2"
                     android:shadowDy="2"
-                    tools:text="/ Mon" />
+                    tools:text="/ Mon"
+                    tools:textColor="@android:color/white" />
 
             </LinearLayout>
 
@@ -169,7 +183,7 @@
 
     <!-- Spacer must be a @RemoteView; can't use Space. -->
     <FrameLayout
-        android:id="@+id/city_spacer"
+        android:id="@+id/citySpacer"
         android:layout_width="match_parent"
         android:layout_height="12dp" />
 

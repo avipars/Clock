@@ -15,11 +15,12 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.best.deskclock.R;
-import com.best.deskclock.Utils;
+import androidx.annotation.NonNull;
+
 import com.best.deskclock.data.DataModel;
 import com.best.deskclock.data.Lap;
 import com.best.deskclock.data.Stopwatch;
+import com.best.deskclock.utils.Utils;
 import com.google.android.material.color.MaterialColors;
 
 import java.util.List;
@@ -77,8 +78,10 @@ public final class StopwatchCircleView extends View {
         mMarkerStrokeSize = Utils.toPixel(12, context);
         mRadiusOffset = Utils.calculateRadiusOffset(mStrokeSize, dotDiameter, mMarkerStrokeSize);
 
-        mRemainderColor = context.getColor(R.color.md_theme_onSurfaceVariant);
-        mCompletedColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorPrimaryInverse, Color.BLACK);
+        mRemainderColor = MaterialColors.getColor(
+                context, com.google.android.material.R.attr.colorOnSurfaceVariant, Color.BLACK);
+        mCompletedColor = MaterialColors.getColor(
+                context, com.google.android.material.R.attr.colorPrimaryInverse, Color.BLACK);
 
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.STROKE);
@@ -97,7 +100,7 @@ public final class StopwatchCircleView extends View {
     }
 
     @Override
-    public void onDraw(Canvas canvas) {
+    public void onDraw(@NonNull Canvas canvas) {
         // Compute the size and location of the circle to be drawn.
         final int xCenter = getWidth() / 2;
         final int yCenter = getHeight() / 2;

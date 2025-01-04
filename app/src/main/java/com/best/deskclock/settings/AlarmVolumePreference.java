@@ -7,11 +7,8 @@
 package com.best.deskclock.settings;
 
 import static android.content.Context.AUDIO_SERVICE;
-import static android.content.Context.NOTIFICATION_SERVICE;
 import static android.media.AudioManager.STREAM_ALARM;
 
-import android.annotation.TargetApi;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.database.ContentObserver;
 import android.media.AudioManager;
@@ -23,30 +20,28 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
+import androidx.preference.SeekBarPreference;
 
 import com.best.deskclock.R;
-import com.best.deskclock.RingtonePreviewKlaxon;
-import com.best.deskclock.data.DataModel;
 
-public class AlarmVolumePreference extends Preference {
+public class AlarmVolumePreference extends SeekBarPreference {
 
-    private static final long ALARM_PREVIEW_DURATION_MS = 5000;
-
+    private AlarmSettingsActivity mAlarmSettingsActivity;
     private SeekBar mSeekbar;
-    private boolean mPreviewPlaying;
 
     public AlarmVolumePreference(Context context, AttributeSet attrs) {
         super(context, attrs);
+        if (context instanceof AlarmSettingsActivity) {
+            mAlarmSettingsActivity = (AlarmSettingsActivity) context;
+        }
     }
 
     @Override
     public void onBindViewHolder(@NonNull PreferenceViewHolder holder) {
         super.onBindViewHolder(holder);
 
-        final Context context = getContext();
-        final AudioManager audioManager = (AudioManager) context.getSystemService(AUDIO_SERVICE);
+        final AudioManager audioManager = (AudioManager) holder.itemView.getContext().getSystemService(AUDIO_SERVICE);
 
         // Disable click feedback for this preference.
         holder.itemView.setClickable(false);
@@ -61,8 +56,6 @@ public class AlarmVolumePreference extends Preference {
         mSeekbar.setMax(maxVolume);
         mSeekbar.setProgress(audioManager.getStreamVolume(STREAM_ALARM) - getMinVolume(audioManager));
 
-        onSeekbarChanged();
-
         final ContentObserver volumeObserver = new ContentObserver(mSeekbar.getHandler()) {
             @Override
             public void onChange(boolean selfChange) {
@@ -73,14 +66,14 @@ public class AlarmVolumePreference extends Preference {
 
         mSeekbar.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
             @Override
-            public void onViewAttachedToWindow(View v) {
-                context.getContentResolver().registerContentObserver(Settings.System.CONTENT_URI,
+            public void onViewAttachedToWindow(@NonNull View v) {
+                v.getContext().getContentResolver().registerContentObserver(Settings.System.CONTENT_URI,
                         true, volumeObserver);
             }
 
             @Override
-            public void onViewDetachedFromWindow(View v) {
-                context.getContentResolver().unregisterContentObserver(volumeObserver);
+            public void onViewDetachedFromWindow(@NonNull View v) {
+                v.getContext().getContentResolver().unregisterContentObserver(volumeObserver);
             }
         });
 
@@ -91,7 +84,6 @@ public class AlarmVolumePreference extends Preference {
                     int newVolume = progress + getMinVolume(audioManager);
                     audioManager.setStreamVolume(STREAM_ALARM, newVolume, 0);
                 }
-                onSeekbarChanged();
             }
 
             @Override
@@ -100,33 +92,12 @@ public class AlarmVolumePreference extends Preference {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if (!mPreviewPlaying) {
-                    // If we are not currently playing, start.
-                    RingtonePreviewKlaxon.start(context, DataModel.getDataModel().getAlarmRingtoneUriFromSettings());
-                    mPreviewPlaying = true;
-                    seekBar.postDelayed(() -> {
-                        RingtonePreviewKlaxon.stop(context);
-                        mPreviewPlaying = false;
-                    }, ALARM_PREVIEW_DURATION_MS);
+                if (mAlarmSettingsActivity != null) {
+                    // Start preview if not already running
+                    mAlarmSettingsActivity.startRingtonePreview();
                 }
             }
         });
-    }
-
-    private void onSeekbarChanged() {
-        mSeekbar.setEnabled(doesDoNotDisturbAllowAlarmPlayback());
-    }
-
-    private boolean doesDoNotDisturbAllowAlarmPlayback() {
-        return !(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) || doesDoNotDisturbAllowAlarmPlaybackNPlus();
-    }
-
-    @TargetApi(Build.VERSION_CODES.N)
-    private boolean doesDoNotDisturbAllowAlarmPlaybackNPlus() {
-        final NotificationManager notificationManager = (NotificationManager)
-                getContext().getSystemService(NOTIFICATION_SERVICE);
-        return notificationManager.getCurrentInterruptionFilter() !=
-                NotificationManager.INTERRUPTION_FILTER_NONE;
     }
 
     private int getMinVolume(AudioManager audioManager) {

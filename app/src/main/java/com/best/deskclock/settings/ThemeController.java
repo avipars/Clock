@@ -2,43 +2,28 @@
 
 package com.best.deskclock.settings;
 
-import static com.best.deskclock.settings.SettingsActivity.BLUE_GRAY_ACCENT_COLOR;
-import static com.best.deskclock.settings.SettingsActivity.BROWN_ACCENT_COLOR;
-import static com.best.deskclock.settings.SettingsActivity.DARK_THEME;
-import static com.best.deskclock.settings.SettingsActivity.DEFAULT_ACCENT_COLOR;
-import static com.best.deskclock.settings.SettingsActivity.GREEN_ACCENT_COLOR;
-import static com.best.deskclock.settings.SettingsActivity.INDIGO_ACCENT_COLOR;
-import static com.best.deskclock.settings.SettingsActivity.LIGHT_THEME;
-import static com.best.deskclock.settings.SettingsActivity.ORANGE_ACCENT_COLOR;
-import static com.best.deskclock.settings.SettingsActivity.PINK_ACCENT_COLOR;
-import static com.best.deskclock.settings.SettingsActivity.RED_ACCENT_COLOR;
-import static com.best.deskclock.settings.SettingsActivity.SYSTEM_THEME;
-
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
+import android.os.Handler;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 
-import com.best.deskclock.R;
-import com.best.deskclock.Utils;
-import com.best.deskclock.data.DataModel;
-
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
 
 /**
  * This class registers ActivityLifecycleCallbacks to collect all activities to a single set.
- * This allows to change the dark mode and the accent color at runtime.
+ * This allows to change settings at runtime.
  */
 public class ThemeController {
     private static final Set<Activity> activities = Collections.newSetFromMap(new WeakHashMap<>());
     private static boolean initialized = false;
-    private static DarkMode darkMode = DarkMode.DEFAULT_DARK_MODE;
-    private static AccentColor accentColor = AccentColor.DEFAULT;
+
+    private static Setting settingChanged = Setting.CHANGED;
 
     /**
      * To initialize this class in the application class.
@@ -52,94 +37,38 @@ public class ThemeController {
     }
 
     /**
-     * Store a selected dark mode in the static field and trigger recreation for all the activities.
-     * @param darkMode Dark mode to use.
+     * Allow all activities to be recreated if a setting has been changed
+     * @param settingChanged the value that indicates that the setting has been changed.
      */
-    public static void applyDarkMode(DarkMode darkMode) {
-        ThemeController.darkMode = darkMode;
+    public static void setNewSetting(Setting settingChanged) {
+        ThemeController.settingChanged = settingChanged;
         for (Activity activity : activities) {
             ActivityCompat.recreate(activity);
         }
     }
 
     /**
-     * Store a selected accent color mode in the static field and trigger recreation for all the activities.
-     * @param accentColor Accent color to use.
+     * Allow all activities to be recreated with a short delay if a setting has been changed.
+     * Used for toggle switches so that their animations are performed correctly.
+     * @param settingChanged the value that indicates that the setting has been changed.
      */
-    public static void applyAccentColor(AccentColor accentColor) {
-        ThemeController.accentColor = accentColor;
+    public static void setNewSettingWithDelay(Setting settingChanged) {
+        ThemeController.settingChanged = settingChanged;
         for (Activity activity : activities) {
-            ActivityCompat.recreate(activity);
+            new Handler().postDelayed(() -> ActivityCompat.recreate(activity), 300);
         }
     }
 
     private static class ActivityCallbacks implements Application.ActivityLifecycleCallbacks {
         @Override
-        public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-            final String getTheme = DataModel.getDataModel().getTheme();
-            final String getColor = DataModel.getDataModel().getAccentColor();
-            if (Utils.isNight(activity.getResources())) {
-                switch (darkMode) {
-                    case DEFAULT_DARK_MODE -> {
-                        switch (getTheme) {
-                            case SYSTEM_THEME ->
-                                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-                            case LIGHT_THEME ->
-                                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                            case DARK_THEME ->
-                                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                        }
-                    }
-
-                    case AMOLED -> {
-                        if (!getTheme.equals(SYSTEM_THEME)) {
-                            activity.setTheme(R.style.AmoledTheme);
-                        }
-                    }
-                }
+        public void onActivityCreated(@NonNull Activity activity, Bundle savedInstanceState) {
+            if (Objects.requireNonNull(settingChanged) == Setting.CHANGED) {
+                activities.add(activity);
             }
-
-            switch (accentColor) {
-                case DEFAULT -> {
-                    if (getColor.equals(DEFAULT_ACCENT_COLOR))
-                        activity.setTheme(R.style.DefaultColor);
-                }
-                case BLUE_GRAY -> {
-                    if (getColor.equals(BLUE_GRAY_ACCENT_COLOR))
-                        activity.setTheme(R.style.BlueGrayAccentColor);
-                }
-                case BROWN -> {
-                    if (getColor.equals(BROWN_ACCENT_COLOR))
-                        activity.setTheme(R.style.BrownAccentColor);
-                }
-                case GREEN -> {
-                    if (getColor.equals(GREEN_ACCENT_COLOR))
-                        activity.setTheme(R.style.GreenAccentColor);
-                }
-                case INDIGO -> {
-                    if (getColor.equals(INDIGO_ACCENT_COLOR)) {
-                        activity.setTheme(R.style.IndigoAccentColor);
-                    }
-                }
-                case ORANGE -> {
-                    if (getColor.equals(ORANGE_ACCENT_COLOR))
-                        activity.setTheme(R.style.OrangeAccentColor);
-                }
-                case PINK -> {
-                    if (getColor.equals(PINK_ACCENT_COLOR))
-                        activity.setTheme(R.style.PinkAccentColor);
-                }
-                case RED -> {
-                    if (getColor.equals(RED_ACCENT_COLOR))
-                        activity.setTheme(R.style.RedAccentColor);
-                }
-            }
-
-            activities.add(activity);
         }
 
         @Override
-        public void onActivityDestroyed(Activity activity) {
+        public void onActivityDestroyed(@NonNull Activity activity) {
             activities.remove(activity);
         }
 
@@ -161,6 +90,6 @@ public class ThemeController {
 
     }
 
-    public enum DarkMode {DEFAULT_DARK_MODE, AMOLED}
-    public enum AccentColor {DEFAULT, BLUE_GRAY, BROWN, GREEN, INDIGO, ORANGE, PINK, RED}
+    public enum Setting {CHANGED}
+
 }

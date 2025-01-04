@@ -3,9 +3,12 @@ Elle n'utilise pas d'autorisation Internet et est donc 100% hors ligne.
 
 Caractéristiques :
 <ul>
-  <li>L'action de basculer et de secouer l'appareil permet d'annuler ou de reporter l'alarme ;</li>
+  <li>L'action de retourner ou de secouer l'appareil permet d'arrêter ou de reporter l'alarme ;</li>
   <li>Désactiver ou reporter l'alarme à l'aide du bouton d'alimentation ou des boutons du volume ;</li>
-  <li>Pour les téléphones Snapdragon uniquement, l'alarme se déclenche lorsque le téléphone est éteint ;</li>
+  <li>Pour quelques appareils Snapdragon uniquement, l'alarme se déclenche lorsqu'ils sont éteints ;</li>
+    <ul>
+      <li>Malheureusement, cette fonctionnalité peut ne pas fonctionner sur certains appareils malgré la présence de l'application système <i>"com.qualcomm.qti.poweroffalarm"</i>.</li>
+    </ul>
   <li>Glisser pour supprimer une alarme ;</li>
   <li>Dupliquer les alarmes;</li>
   <li>Titre de l'alarme personnalisable ;</li>
@@ -20,6 +23,7 @@ Caractéristiques :
   <li>Possibilité de partager votre chronomètre avec vos contacts ;</li>
   <li>Écran de veille personnalisable ;</li>
   <li>Widgets modernes ;</li>
+  <li>Widgets personnalisables ;</li>
   <li>Design material ;</li>
   <li>Couleurs dynamiques pour Android 12+ ;</li>
 </ul>

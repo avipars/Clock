@@ -14,7 +14,7 @@
     android:baselineAligned="false"
     android:layout_marginHorizontal="10dp"
     android:layout_marginTop="20dp"
-    android:layout_marginBottom="10dp"
+    android:layout_marginBottom="8dp"
     android:gravity="center_vertical">
 
     <include layout="@layout/settings_preference_image_frame"/>
@@ -48,7 +48,6 @@
             android:singleLine="true"
             android:textAlignment="viewStart"
             android:textColor="?android:attr/textColorSecondary"
-            android:maxLines="10"
             tools:text="Preference category summary" />
 
     </RelativeLayout>

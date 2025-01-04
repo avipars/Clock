@@ -3,7 +3,8 @@
 package com.best.deskclock.bedtime;
 
 import static android.content.Context.VIBRATOR_SERVICE;
-import static com.best.deskclock.settings.SettingsActivity.KEY_AMOLED_DARK_MODE;
+import static com.best.deskclock.settings.AlarmSettingsActivity.MATERIAL_TIME_PICKER_ANALOG_STYLE;
+import static com.best.deskclock.settings.InterfaceCustomizationActivity.KEY_AMOLED_DARK_MODE;
 import static com.best.deskclock.uidata.UiDataModel.Tab.BEDTIME;
 
 import android.content.ContentResolver;
@@ -33,9 +34,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 
 import com.best.deskclock.DeskClockFragment;
-import com.best.deskclock.LogUtils;
 import com.best.deskclock.R;
-import com.best.deskclock.Utils;
 import com.best.deskclock.alarms.AlarmUpdateHandler;
 import com.best.deskclock.alarms.dataadapter.AlarmItemViewHolder;
 import com.best.deskclock.bedtime.beddata.DataSaver;
@@ -45,9 +44,12 @@ import com.best.deskclock.events.Events;
 import com.best.deskclock.provider.Alarm;
 import com.best.deskclock.ringtone.RingtonePickerActivity;
 import com.best.deskclock.uidata.UiDataModel;
+import com.best.deskclock.utils.LogUtils;
+import com.best.deskclock.utils.Utils;
 import com.best.deskclock.widget.EmptyViewController;
 import com.best.deskclock.widget.TextTime;
 import com.best.deskclock.widget.toast.SnackbarManager;
+
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.card.MaterialCardView;
@@ -57,6 +59,7 @@ import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Fragment that shows the bedtime.
@@ -83,6 +86,8 @@ public final class BedtimeFragment extends DeskClockFragment {
     TextTime mWakeupText;
     TextTime mBedtimeText;
     LinearLayout mRepeatDays;
+    CheckBox mDismissBedtimeAlarmWhenRingtoneEnds;
+    CheckBox mBedtimeAlarmSnoozeActions;
     CheckBox mVibrate;
     final CompoundButton[] mDayButtons = new CompoundButton[7];
     CompoundButton mOnOff;
@@ -116,8 +121,8 @@ public final class BedtimeFragment extends DeskClockFragment {
             bedtimeCardView.setCardBackgroundColor(Color.TRANSPARENT);
         }
 
-        final boolean isCardBackgroundBorderDisplayed = DataModel.getDataModel().isCardBackgroundBorderDisplayed();
-        if (isCardBackgroundBorderDisplayed) {
+        final boolean isCardBorderDisplayed = DataModel.getDataModel().isCardBorderDisplayed();
+        if (isCardBorderDisplayed) {
             bedtimeCardView.setStrokeWidth(Utils.toPixel(2, mContext));
             bedtimeCardView.setStrokeColor(
                     MaterialColors.getColor(mContext, com.google.android.material.R.attr.colorPrimary, Color.BLACK)
@@ -127,7 +132,8 @@ public final class BedtimeFragment extends DeskClockFragment {
         mEmptyView = view.findViewById(R.id.bedtime_empty_view);
         final Drawable noAlarmsIcon = Utils.toScaledBitmapDrawable(mContext, R.drawable.ic_alarm_off, 2.5f);
         if (noAlarmsIcon != null) {
-            noAlarmsIcon.setTint(mContext.getColor(R.color.md_theme_onSurfaceVariant));
+            noAlarmsIcon.setTint(MaterialColors.getColor(
+                    mContext, com.google.android.material.R.attr.colorOnSurfaceVariant, Color.BLACK));
         }
         mEmptyView.setCompoundDrawablesWithIntrinsicBounds(null, noAlarmsIcon, null, null);
         mEmptyView.setCompoundDrawablePadding(Utils.toPixel(30, mContext));
@@ -212,13 +218,16 @@ public final class BedtimeFragment extends DeskClockFragment {
 
         final String getDarkMode = DataModel.getDataModel().getDarkMode();
         if (Utils.isNight(getResources()) && getDarkMode.equals(KEY_AMOLED_DARK_MODE)) {
-            mBottomSheetDialog.getWindow().setNavigationBarColor(
+            Objects.requireNonNull(mBottomSheetDialog.getWindow()).setNavigationBarColor(
                     MaterialColors.getColor(mContext, com.google.android.material.R.attr.colorSurface, Color.BLACK)
             );
         }
 
         mRingtone = mBottomSheetDialog.findViewById(R.id.choose_ringtone_bedtime);
         mClock = mBottomSheetDialog.findViewById(R.id.wakeup_time);
+        mDismissBedtimeAlarmWhenRingtoneEnds = mBottomSheetDialog.findViewById(
+                R.id.dismiss_bedtime_alarm_when_ringtone_ends_onoff);
+        mBedtimeAlarmSnoozeActions = mBottomSheetDialog.findViewById(R.id.bedtime_alarm_snooze_actions_onoff);
         mVibrate = mBottomSheetDialog.findViewById(R.id.vibrate_onoff_wakeup);
         mOnOff = mBottomSheetDialog.findViewById(R.id.toggle_switch_wakeup);
         mNoWakeupAlarmText = mBottomSheetDialog.findViewById(R.id.no_wakeup_alarm_text);
@@ -259,6 +268,26 @@ public final class BedtimeFragment extends DeskClockFragment {
                 hoursOfSleep(alarm);
 
                 bindNoWakeupAlarmText();
+            }
+        });
+
+        mDismissBedtimeAlarmWhenRingtoneEnds.setOnClickListener(v -> {
+            boolean newState = ((CheckBox) v).isChecked();
+            if (newState != alarm.dismissAlarmWhenRingtoneEnds) {
+                alarm.dismissAlarmWhenRingtoneEnds = newState;
+                Events.sendBedtimeEvent(R.string.action_toggle_dismiss_alarm_when_ringtone_ends, R.string.label_deskclock);
+                mAlarmUpdateHandler.asyncUpdateAlarm(alarm, false, true);
+                Utils.setVibrationTime(mContext, 50);
+            }
+        });
+
+        mBedtimeAlarmSnoozeActions.setOnClickListener(v -> {
+            boolean newState = ((CheckBox) v).isChecked();
+            if (newState != alarm.alarmSnoozeActions) {
+                alarm.alarmSnoozeActions = newState;
+                Events.sendBedtimeEvent(R.string.action_toggle_alarm_snooze_actions, R.string.label_deskclock);
+                mAlarmUpdateHandler.asyncUpdateAlarm(alarm, false, true);
+                Utils.setVibrationTime(mContext, 50);
             }
         });
 
@@ -312,6 +341,8 @@ public final class BedtimeFragment extends DeskClockFragment {
 
     private void bindWakeStuff(Alarm alarm) {
         bindDaysOfWeekButtons(alarm, mContext);
+        bindDismissBedtimeAlarmWhenRingtoneEnds(alarm);
+        bindBedtimeAlarmSnoozeActions(alarm);
         bindVibrator(alarm);
         bindRingtone(mContext, mAlarm);
         bindOnOffSwitch(alarm);
@@ -339,11 +370,33 @@ public final class BedtimeFragment extends DeskClockFragment {
             final CompoundButton dayButton = mDayButtons[i];
             if (alarm.daysOfWeek.isBitOn(weekdays.get(i))) {
                 dayButton.setChecked(true);
-                dayButton.setTextColor(context.getColor(R.color.md_theme_inverseOnSurface));
+                dayButton.setTextColor(MaterialColors.getColor(
+                        context, com.google.android.material.R.attr.colorOnSurfaceInverse, Color.BLACK));
             } else {
                 dayButton.setChecked(false);
-                dayButton.setTextColor(context.getColor(R.color.md_theme_inverseSurface));
+                dayButton.setTextColor(MaterialColors.getColor(
+                        context, com.google.android.material.R.attr.colorSurfaceInverse, Color.BLACK));
             }
+        }
+    }
+
+    private void bindDismissBedtimeAlarmWhenRingtoneEnds(Alarm alarm) {
+        final int timeoutMinutes = DataModel.getDataModel().getAlarmTimeout();
+        if (timeoutMinutes == -2) {
+            mDismissBedtimeAlarmWhenRingtoneEnds.setVisibility(View.GONE);
+        } else {
+            mDismissBedtimeAlarmWhenRingtoneEnds.setVisibility(View.VISIBLE);
+            mDismissBedtimeAlarmWhenRingtoneEnds.setChecked(alarm.dismissAlarmWhenRingtoneEnds);
+        }
+    }
+
+    private void bindBedtimeAlarmSnoozeActions(Alarm alarm) {
+        final int snoozeMinutes = DataModel.getDataModel().getSnoozeLength();
+        if (snoozeMinutes == -1) {
+            mBedtimeAlarmSnoozeActions.setVisibility(View.GONE);
+        } else {
+            mBedtimeAlarmSnoozeActions.setVisibility(View.VISIBLE);
+            mBedtimeAlarmSnoozeActions.setChecked(alarm.alarmSnoozeActions);
         }
     }
 
@@ -378,13 +431,20 @@ public final class BedtimeFragment extends DeskClockFragment {
     }
 
     private void bindNoWakeupAlarmText() {
+        final int timeoutMinutes = DataModel.getDataModel().getAlarmTimeout();
+        final int snoozeMinutes = DataModel.getDataModel().getSnoozeLength();
+
         if (mOnOff.isChecked()) {
             mNoWakeupAlarmText.setVisibility(View.GONE);
-            mVibrate.setVisibility(hasVibrator() ? View.VISIBLE : View.INVISIBLE);
+            mDismissBedtimeAlarmWhenRingtoneEnds.setVisibility(timeoutMinutes == -2 ? View.GONE : View.VISIBLE);
+            mBedtimeAlarmSnoozeActions.setVisibility(snoozeMinutes == -1 ? View.GONE : View.VISIBLE);
+            mVibrate.setVisibility(hasVibrator() ? View.VISIBLE : View.GONE);
             mRingtone.setVisibility(View.VISIBLE);
         } else {
             mNoWakeupAlarmText.setVisibility(View.VISIBLE);
-            mVibrate.setVisibility(View.INVISIBLE);
+            mDismissBedtimeAlarmWhenRingtoneEnds.setVisibility(timeoutMinutes == -2 ? View.GONE : View.INVISIBLE);
+            mBedtimeAlarmSnoozeActions.setVisibility(snoozeMinutes == -1 ? View.GONE : View.INVISIBLE);
+            mVibrate.setVisibility(hasVibrator() ? View.INVISIBLE : View.GONE);
             mRingtone.setVisibility(View.INVISIBLE);
         }
     }
@@ -406,8 +466,9 @@ public final class BedtimeFragment extends DeskClockFragment {
         final String getDarkMode = DataModel.getDataModel().getDarkMode();
         if (Utils.isNight(mContext.getResources()) && getDarkMode.equals(KEY_AMOLED_DARK_MODE)) {
             mNotificationList.getPopupBackground().setColorFilter(
-                    mContext.getColor(R.color.md_theme_surface), PorterDuff.Mode.SRC_IN);
-            mBottomSheetDialog.getWindow().setNavigationBarColor(
+                    MaterialColors.getColor(mContext, com.google.android.material.R.attr.colorSurface, Color.BLACK),
+                    PorterDuff.Mode.SRC_IN);
+            Objects.requireNonNull(mBottomSheetDialog.getWindow()).setNavigationBarColor(
                     MaterialColors.getColor(mContext, com.google.android.material.R.attr.colorSurface, Color.BLACK)
             );
         }
@@ -482,7 +543,8 @@ public final class BedtimeFragment extends DeskClockFragment {
             final CompoundButton dayButton = dayButtonFrame.findViewById(R.id.day_button_box);
             final int weekday = weekdays.get(i);
             dayButton.setChecked(true);
-            dayButton.setTextColor(mContext.getColor(R.color.md_theme_inverseOnSurface));
+            dayButton.setTextColor(MaterialColors.getColor(
+                    mContext, com.google.android.material.R.attr.colorOnSurfaceInverse, Color.BLACK));
             dayButton.setText(UiDataModel.getUiDataModel().getShortWeekday(weekday));
             dayButton.setContentDescription(UiDataModel.getUiDataModel().getLongWeekday(weekday));
             mRepeatDays.addView(dayButtonFrame);
@@ -519,10 +581,12 @@ public final class BedtimeFragment extends DeskClockFragment {
             final CompoundButton dayButton = mDayButtons[i];
             if (mSaver.daysOfWeek.isBitOn(weekdays.get(i))) {
                 dayButton.setChecked(true);
-                dayButton.setTextColor(context.getColor(R.color.md_theme_inverseOnSurface));
+                dayButton.setTextColor(MaterialColors.getColor(
+                        context, com.google.android.material.R.attr.colorOnSurfaceInverse, Color.BLACK));
             } else {
                 dayButton.setChecked(false);
-                dayButton.setTextColor(context.getColor(R.color.md_theme_inverseSurface));
+                dayButton.setTextColor(MaterialColors.getColor(
+                        context, com.google.android.material.R.attr.colorSurfaceInverse, Color.BLACK));
             }
         }
     }
@@ -575,10 +639,13 @@ public final class BedtimeFragment extends DeskClockFragment {
         @TimeFormat int clockFormat;
         boolean isSystem24Hour = DateFormat.is24HourFormat(mContext);
         clockFormat = isSystem24Hour ? TimeFormat.CLOCK_24H : TimeFormat.CLOCK_12H;
+        String getMaterialTimePickerStyle = DataModel.getDataModel().getMaterialTimePickerStyle();
 
         MaterialTimePicker materialTimePicker = new MaterialTimePicker.Builder()
                 .setTimeFormat(clockFormat)
-                .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
+                .setInputMode(getMaterialTimePickerStyle.equals(MATERIAL_TIME_PICKER_ANALOG_STYLE)
+                        ? MaterialTimePicker.INPUT_MODE_CLOCK
+                        : MaterialTimePicker.INPUT_MODE_KEYBOARD)
                 .setHour(hour)
                 .setMinute(minute)
                 .build();
@@ -670,6 +737,7 @@ public final class BedtimeFragment extends DeskClockFragment {
 
     private void createAlarm() {
         final Alarm alarm = new Alarm();
+        final boolean areAlarmVibrationsEnabledByDefault = DataModel.getDataModel().areAlarmVibrationsEnabledByDefault();
         alarm.id = BEDTIME_ID;
         alarm.hour = 8;
         alarm.minutes = 30;
@@ -677,7 +745,9 @@ public final class BedtimeFragment extends DeskClockFragment {
         alarm.daysOfWeek = Weekdays.fromBits(31);
         alarm.label = BEDTIME_LABEL;
         alarm.alert = DataModel.getDataModel().getAlarmRingtoneUriFromSettings();
-        alarm.vibrate = false;
+        alarm.dismissAlarmWhenRingtoneEnds = false;
+        alarm.alarmSnoozeActions = true;
+        alarm.vibrate = areAlarmVibrationsEnabledByDefault;
         mWakeupText.setTime(8, 30);
         mWakeupText.setAlpha(AlarmItemViewHolder.CLOCK_DISABLED_ALPHA);
         hoursOfSleep(alarm);

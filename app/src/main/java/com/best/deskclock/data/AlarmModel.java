@@ -9,9 +9,10 @@ package com.best.deskclock.data;
 import android.content.SharedPreferences;
 import android.net.Uri;
 
-import com.best.deskclock.data.DataModel.AlarmVolumeButtonBehavior;
+import com.best.deskclock.data.DataModel.PowerButtonBehavior;
+import com.best.deskclock.data.DataModel.VolumeButtonBehavior;
 import com.best.deskclock.provider.Alarm;
-import com.best.deskclock.settings.SettingsActivity;
+import com.best.deskclock.settings.AlarmSettingsActivity;
 
 /**
  * All alarm data will eventually be accessed via this model.
@@ -102,11 +103,11 @@ final class AlarmModel {
         return mSettingsModel.getAlarmCrescendoDuration();
     }
 
-    AlarmVolumeButtonBehavior getAlarmVolumeButtonBehavior() {
+    VolumeButtonBehavior getAlarmVolumeButtonBehavior() {
         return mSettingsModel.getAlarmVolumeButtonBehavior();
     }
 
-    AlarmVolumeButtonBehavior getAlarmPowerButtonBehavior() {
+    PowerButtonBehavior getAlarmPowerButtonBehavior() {
         return mSettingsModel.getAlarmPowerButtonBehavior();
     }
 
@@ -126,6 +127,78 @@ final class AlarmModel {
         return mSettingsModel.getShakeAction();
     }
 
+    int getAlarmNotificationReminderTime() {
+        return mSettingsModel.getAlarmNotificationReminderTime();
+    }
+
+    boolean areAlarmVibrationsEnabledByDefault() {
+        return mSettingsModel.areAlarmVibrationsEnabledByDefault();
+    }
+
+    boolean isOccasionalAlarmDeletedByDefault() {
+        return mSettingsModel.isOccasionalAlarmDeletedByDefault();
+    }
+
+    String getMaterialTimePickerStyle() {
+        return mSettingsModel.getMaterialTimePickerStyle();
+    }
+
+    DataModel.ClockStyle getAlarmClockStyle() {
+        return mSettingsModel.getAlarmClockStyle();
+    }
+
+    public boolean isAlarmSecondsHandDisplayed() {
+        return mSettingsModel.isAlarmSecondsHandDisplayed();
+    }
+
+    public int getAlarmBackgroundColor() {
+        return mSettingsModel.getAlarmBackgroundColor();
+    }
+
+    public int getAlarmBackgroundAmoledColor() {
+        return mSettingsModel.getAlarmBackgroundAmoledColor();
+    }
+
+    public int getAlarmClockColor() {
+        return mSettingsModel.getAlarmClockColor();
+    }
+
+    public int getAlarmSecondsHandColor() {
+        return mSettingsModel.getAlarmSecondsHandColor();
+    }
+
+    public int getAlarmTitleColor() {
+        return mSettingsModel.getAlarmTitleColor();
+    }
+
+    public int getSnoozeButtonColor() {
+        return mSettingsModel.getSnoozeButtonColor();
+    }
+
+    public int getDismissButtonColor() {
+        return mSettingsModel.getDismissButtonColor();
+    }
+
+    public int getAlarmButtonColor() {
+        return mSettingsModel.getAlarmButtonColor();
+    }
+
+    public int getPulseColor() {
+        return mSettingsModel.getPulseColor();
+    }
+
+    public String getAlarmClockFontSize() {
+        return mSettingsModel.getAlarmClockFontSize();
+    }
+
+    public String getAlarmTitleFontSize() {
+        return mSettingsModel.getAlarmTitleFontSize();
+    }
+
+    public boolean isRingtoneTitleDisplayed() {
+        return mSettingsModel.isRingtoneTitleDisplayed();
+    }
+
     /**
      * This receiver is notified when shared preferences change. Cached information built on
      * preferences must be cleared.
@@ -133,7 +206,7 @@ final class AlarmModel {
     private final class PreferenceListener implements SharedPreferences.OnSharedPreferenceChangeListener {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-            if (SettingsActivity.KEY_DEFAULT_ALARM_RINGTONE.equals(key)) {
+            if (AlarmSettingsActivity.KEY_DEFAULT_ALARM_RINGTONE.equals(key)) {
                 mAlarmRingtoneUriFromSettings = null;
                 mAlarmRingtoneTitle = null;
             }

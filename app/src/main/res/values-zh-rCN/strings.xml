@@ -1,13 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright (C) 2016 The Android Open Source Project
     modified
     SPDX-License-Identifier: Apache-2.0 AND GPL-3.0-only
--->
-
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+--><resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_label" msgid="6674495003718166674">"时钟"</string>
-    <string name="label" msgid="162189613902857319">"标签"</string>
     <string name="default_label" msgid="5590025289805630372">"闹钟"</string>
     <string name="alarm_vibrate" msgid="3476686921490362230">"振动"</string>
     <string name="delete" msgid="5732434972457000541">"删除"</string>
@@ -20,157 +17,136 @@
     <string name="your_sounds" msgid="1672779351352629681">"您的提示音"</string>
     <string name="device_sounds" msgid="1584894148222639823">"设备提示音"</string>
     <string name="custom_ringtone_lost_permissions" msgid="3406310054255354331">"无法访问提示音内容。"</string>
-    <string name="default_timer_ringtone_title" msgid="1370799536406862317">"计时结束"</string>
+    <string name="default_timer_ringtone_title" msgid="1370799536406862317">定时器已到期</string>
     <string name="alarm_tomorrow" msgid="131356848787643420">"明天"</string>
     <string name="alarm_today" msgid="7873594221106531654">"今天"</string>
     <string name="alarm_alert_dismiss_text" msgid="4942914605480888820">"关闭"</string>
     <string name="alarm_missed_title" msgid="3828345099754063392">"错过的闹钟"</string>
-    <string name="alarm_missed_text" msgid="6585658367289194023">"<xliff:g id="ALARM_TIME">%1$s</xliff:g> - <xliff:g id="ALARM_LABEL">%2$s</xliff:g>"</string>
+    <string name="alarm_missed_text" msgid="6585658367289194023"><xliff:g id="alarm_time">%1$s</xliff:g> - <xliff:g id="alarm_label">%2$s</xliff:g></string>
     <string name="alarm_alert_snoozed_text" msgid="7064642998528766113">"已暂停"</string>
     <plurals name="alarm_alert_snooze_duration" formatted="false" msgid="7844300009062867865">
-        <item quantity="other"><xliff:g id="NUMBER">%d</xliff:g> 分钟</item>
-        <item quantity="one">1 分钟</item>
+        <item quantity="other"><xliff:g example="7" id="number">%d</xliff:g> 分钟</item>
     </plurals>
     <string name="alarm_alert_off_text" msgid="4472073417593915002">"闹钟已关闭"</string>
     <string name="alarm_alert_snooze_text" msgid="1774416052207651584">"暂停"</string>
     <plurals name="alarm_alert_snooze_set" formatted="false" msgid="3212729193036041768">
-        <item quantity="other"><xliff:g id="MINUTES">%d</xliff:g> 分钟后提醒。</item>
-        <item quantity="one">1 分钟后提醒。</item>
+        <item quantity="other">暂停 <xliff:g id="minutes">%d</xliff:g> 分钟。</item>
     </plurals>
-    <string name="alarm_alert_snooze_until" msgid="6958013659168344550">"闹钟已暂停，将于<xliff:g id="TIME">%s</xliff:g>再响"</string>
+    <string name="alarm_alert_snooze_until" msgid="6958013659168344550">暂停直到 <xliff:g id="time">%s</xliff:g></string>
     <string name="alarm_alert_predismiss_title" msgid="5723945586913705445">"预定的闹钟"</string>
     <string name="missed_alarm_has_been_deleted" msgid="5295473204045979335">"错过的闹钟已删除"</string>
     <string name="timer_notifications_less_min" msgid="5481375048976427255">"还剩不到 1 分钟"</string>
-    <string name="timer_notifications_hours" msgid="1613266446037145138">"<xliff:g id="REMAINING"> %3$s</xliff:g> <xliff:g id="HOURS">%1$s</xliff:g>"</string>
-    <string name="timer_notifications_minutes" msgid="8543138714519498893">"<xliff:g id="REMAINING"> %3$s</xliff:g> <xliff:g id="MINUTES">%2$s</xliff:g>"</string>
-    <string name="timer_notifications_hours_minutes" msgid="4788475350933275505">"还剩 <xliff:g id="HOURS">%1$s</xliff:g> <xliff:g id="MINUTES"> %2$s</xliff:g>"</string>
-    <string name="timer_notifications_seconds" msgid="122102514929728907">"<xliff:g id="REMAINING"> %3$s</xliff:g> <xliff:g id="SECONDS">%4$s</xliff:g>"</string>
-    <string name="timer_notifications_minutes_seconds" msgid="7059651926379491350">"<xliff:g id="REMAINING"> %3$s</xliff:g> <xliff:g id="MINUTES">%2$s</xliff:g> <xliff:g id="SECONDS"> %4$s</xliff:g>"</string>
-    <string name="timer_notifications_hours_seconds" msgid="8168090805113197804">"<xliff:g id="REMAINING"> %3$s</xliff:g> <xliff:g id="HOURS">%1$s</xliff:g> <xliff:g id="SECONDS"> %4$s</xliff:g>"</string>
-    <string name="timer_notifications_hours_minutes_seconds" msgid="4666176878038730417">"<xliff:g id="REMAINING"> %3$s</xliff:g> <xliff:g id="HOURS">%1$s</xliff:g> <xliff:g id="MINUTES"> %2$s</xliff:g> <xliff:g id="SECONDS"> %4$s</xliff:g>"</string>
-    <string name="timer_accessibility_one_minute_added" msgid="6096646178998456004">"定时器已增加一分钟，<xliff:g id="TIME">%1$s</xliff:g>"</string>
+    <string name="timer_notifications_hours" msgid="1613266446037145138"><xliff:g example="2 hours" id="HOURS">%1$s</xliff:g><xliff:g example="remaining" id="REMAINING"> %3$s</xliff:g></string>
+    <string name="timer_notifications_minutes" msgid="8543138714519498893"><xliff:g example="2 minutes" id="MINUTES">%2$s</xliff:g><xliff:g example="remaining" id="REMAINING"> %3$s</xliff:g></string>
+    <string name="timer_notifications_hours_minutes" msgid="4788475350933275505">还剩 <xliff:g example="2 hours" id="HOURS">%1$s</xliff:g><xliff:g example="2 minutes" id="MINUTES"> %2$s</xliff:g></string>
+    <string name="timer_notifications_seconds" msgid="122102514929728907"><xliff:g example="2 seconds" id="SECONDS">%4$s</xliff:g><xliff:g example="remaining" id="REMAINING"> %3$s</xliff:g></string>
+    <string name="timer_notifications_minutes_seconds" msgid="7059651926379491350"><xliff:g example="2 minutes" id="MINUTES">%2$s</xliff:g> <xliff:g example="2 seconds" id="SECONDS"> %4$s</xliff:g><xliff:g example="remaining" id="REMAINING"> %3$s</xliff:g></string>
+    <string name="timer_notifications_hours_seconds" msgid="8168090805113197804"><xliff:g example="2 hours" id="HOURS">%1$s</xliff:g> <xliff:g example="2 seconds" id="SECONDS"> %4$s</xliff:g><xliff:g example="remaining" id="REMAINING"> %3$s</xliff:g></string>
+    <string name="timer_notifications_hours_minutes_seconds" msgid="4666176878038730417"><xliff:g example="2 hours" id="HOURS">%1$s</xliff:g><xliff:g example="2 minutes" id="MINUTES"> %2$s</xliff:g><xliff:g example="2 seconds" id="SECONDS"> %4$s</xliff:g><xliff:g example="remaining" id="REMAINING"> %3$s</xliff:g></string>
+    <string name="timer_accessibility_custom_time_added" msgid="6096646178998456004">定时器增加了 %1$s 分钟，<xliff:g example="5 hours remaining" id="TIME">%2$s</xliff:g></string>
     <string name="timer_remaining_single" msgid="6782851171906765864">"还剩"</string>
     <string name="timer_remaining_multiple" msgid="6052775962092160851">"还剩"</string>
-    <string-array name="alarm_set">
-        <item msgid="6450913786084215050">"闹钟时间已设为不到1分钟后。"</item>
-        <item msgid="6002066367368421848">"闹钟时间已设为 <xliff:g id="DAYS">%1$s</xliff:g>后。"</item>
-        <item msgid="8824719306247973774">"闹钟时间已设为 <xliff:g id="HOURS">%2$s</xliff:g>后。"</item>
-        <item msgid="8182406852935468862">"闹钟时间已设为 <xliff:g id="DAYS">%1$s</xliff:g><xliff:g id="HOURS">%2$s</xliff:g>后。"</item>
-        <item msgid="2532279224777213194">"闹钟时间已设为 <xliff:g id="MINUTES">%3$s</xliff:g>后。"</item>
-        <item msgid="5936557894247187717">"闹钟时间已设为 <xliff:g id="DAYS">%1$s</xliff:g><xliff:g id="MINUTES">%3$s</xliff:g>后。"</item>
-        <item msgid="9115697840826129603">"闹钟时间已设为 <xliff:g id="HOURS">%2$s</xliff:g><xliff:g id="MINUTES">%3$s</xliff:g>后。"</item>
-        <item msgid="2332583385137381060">"闹钟时间已设为 <xliff:g id="DAYS">%1$s</xliff:g><xliff:g id="HOURS">%2$s</xliff:g><xliff:g id="MINUTES">%3$s</xliff:g>后。"</item>
-    </string-array>
+    <string name="alarm_confirmation_toast_1">闹钟时间已设为不到 1 分钟后。</string>
+    <string name="alarm_confirmation_toast_2">闹钟时间已设为 <xliff:g example="2 days" id="DAYS">%1$s</xliff:g>后。</string>
+    <string name="alarm_confirmation_toast_3">闹钟时间已设为 <xliff:g example="2 hours" id="HOURS">%2$s</xliff:g>后。</string>
+    <string name="alarm_confirmation_toast_4">闹钟时间已设为 <xliff:g example="2 days" id="DAYS">%1$s</xliff:g> <xliff:g example="2 hours" id="HOURS">%2$s</xliff:g>后。</string>
+    <string name="alarm_confirmation_toast_5">闹钟时间已设为 <xliff:g example="2 minutes" id="MINUTES">%3$s</xliff:g>后。</string>
+    <string name="alarm_confirmation_toast_6">闹钟时间已设为 <xliff:g example="2 days" id="DAYS">%1$s</xliff:g> <xliff:g example="2 minutes" id="MINUTES">%3$s</xliff:g>后。</string>
+    <string name="alarm_confirmation_toast_7">闹钟时间已设为 <xliff:g example="2 hours" id="HOURS">%2$s</xliff:g> <xliff:g example="2 minutes" id="MINUTES">%3$s</xliff:g>后。</string>
+    <string name="alarm_confirmation_toast_8">闹钟时间已设为 <xliff:g example="2 days" id="DAYS">%1$s</xliff:g> <xliff:g example="2 hours" id="HOURS">%2$s</xliff:g> <xliff:g example="2 minutes" id="MINUTES">%3$s</xliff:g>后。</string>
     <plurals name="days" formatted="false" msgid="3706846447285206235">
-        <item quantity="other"><xliff:g id="NUMBER">%s</xliff:g> 天</item>
-        <item quantity="one">1 天</item>
+        <item quantity="other"><xliff:g example="7" id="number">%s</xliff:g> 天</item>
     </plurals>
     <plurals name="hours" formatted="false" msgid="3871283109767171655">
-        <item quantity="other"><xliff:g id="NUMBER">%s</xliff:g> 小时</item>
-        <item quantity="one">1 小时</item>
+        <item quantity="other"><xliff:g example="7" id="number">%s</xliff:g> 小时</item>
     </plurals>
     <plurals name="hours_short" formatted="false" msgid="3709250715691092925">
-        <item quantity="other"><xliff:g id="NUMBER">%s</xliff:g> 小时</item>
-        <item quantity="one">1 小时</item>
+        <item quantity="other"><xliff:g example="7" id="number">%s</xliff:g> 小时</item>
     </plurals>
     <plurals name="minutes" formatted="false" msgid="5484431721696058697">
-        <item quantity="other"><xliff:g id="NUMBER">%s</xliff:g> 分钟</item>
-        <item quantity="one">1 分钟</item>
+        <item quantity="other"><xliff:g example="7" id="number">%s</xliff:g> 分钟</item>
     </plurals>
     <plurals name="minutes_short" formatted="false" msgid="6397328304369080233">
-        <item quantity="other"><xliff:g id="NUMBER">%s</xliff:g> 分钟</item>
-        <item quantity="one">1 分钟</item>
+        <item quantity="other"><xliff:g example="7" id="number">%s</xliff:g> 分钟</item>
     </plurals>
     <plurals name="seconds" formatted="false" msgid="670343577734266047">
-        <item quantity="other"><xliff:g id="NUMBER">%s</xliff:g> 秒</item>
-        <item quantity="one">1 秒</item>
+        <item quantity="other"><xliff:g example="7" id="number">%s</xliff:g> 秒</item>
     </plurals>
     <string name="every_day" msgid="4100909974923444602">"每天"</string>
-    <string name="day_concat" msgid="971998564991636532">", "</string>
+    <string name="day_concat" msgid="971998564991636532">"， "</string>
     <string name="loading_widget" msgid="5306242862476796500">"正在加载…"</string>
-    <string name="analog_gadget" msgid="1670505720837152766">"指针时钟"</string>
-    <string name="digital_gadget" msgid="2326954556720571358">"数字时钟"</string>
+    <string name="analog_widget" msgid="1670505720837152766">指针时钟</string>
+    <string name="digital_widget" msgid="2326954556720571358">"数字时钟"</string>
     <string name="settings" msgid="5849739030579520686">"设置"</string>
     <string name="snooze_duration_title" msgid="1097309861110780483">"暂停时长"</string>
-    <string name="crescendo_duration_title" msgid="8606408542726189528">"逐步增大音量"</string>
-    <string name="auto_silence_title" msgid="2012754009554434544">"闹铃时长"</string>
+    <string name="crescendo_duration_title" msgid="8606408542726189528">逐渐增加音量</string>
+    <string name="auto_silence_title" msgid="2012754009554434544">之后静音</string>
     <plurals name="auto_silence_summary" formatted="false" msgid="6579258788774360396">
-        <item quantity="other"><xliff:g id="FORMATTED_NUMBER">%s</xliff:g> 分钟</item>
-        <item quantity="one">1 分钟</item>
+        <item quantity="other"><xliff:g example="7" id="formatted_number">%s</xliff:g> 分钟</item>
     </plurals>
-    <string name="auto_silence_never" msgid="4821982647348750809">"不停歇"</string>
-    <string-array name="auto_silence_entries">
-        <item msgid="3024545954917711306">"1 分钟"</item>
-        <item msgid="5431906692406316549">"5 分钟"</item>
-        <item msgid="7742728812068919959">"10 分钟"</item>
-        <item msgid="2855948657259647629">"15 分钟"</item>
-        <item msgid="6330196381284475079">"20 分钟"</item>
-        <item msgid="7809240121716151904">"25 分钟"</item>
-        <item msgid="4278641338024561333">"不停歇"</item>
-    </string-array>
-    <string-array name="crescendo_entries">
-        <item msgid="7435149932182641128">"关闭"</item>
-        <item msgid="7195451681426992018">"5 秒"</item>
-        <item msgid="592917601923801901">"10 秒"</item>
-        <item msgid="5050318776687582653">"15 秒"</item>
-        <item msgid="6997726466563948756">"20 秒"</item>
-        <item msgid="248014374051498284">"30 秒"</item>
-        <item msgid="8010211657612404516">"40 秒"</item>
-        <item msgid="623829984393124488">"50 秒"</item>
-        <item msgid="5261571706794132923">"60 秒"</item>
-    </string-array>
-    <string-array name="snooze_duration_entries">
-        <item msgid="7668553664977446797">"1 分钟"</item>
-        <item msgid="4482596794620161030">"2 分钟"</item>
-        <item msgid="8478276201849960314">"3 分钟"</item>
-        <item msgid="4038456474851212478">"4 分钟"</item>
-        <item msgid="6298175579152122770">"5 分钟"</item>
-        <item msgid="9021860177999278496">"6 分钟"</item>
-        <item msgid="7224689200902680256">"7 分钟"</item>
-        <item msgid="4610012663985162123">"8 分钟"</item>
-        <item msgid="1717028898015659426">"9 分钟"</item>
-        <item msgid="8058492636464337699">"10 分钟"</item>
-        <item msgid="577767219993868603">"11 分钟"</item>
-        <item msgid="3710047869487864775">"12 分钟"</item>
-        <item msgid="3794200935630619331">"13 分钟"</item>
-        <item msgid="5462266433522229437">"14 分钟"</item>
-        <item msgid="2192100038569306041">"15 分钟"</item>
-        <item msgid="6636326047858437620">"16 分钟"</item>
-        <item msgid="2481054808772108352">"17 分钟"</item>
-        <item msgid="4080984064428458050">"18 分钟"</item>
-        <item msgid="5844319398703041730">"19 分钟"</item>
-        <item msgid="2334964289857921073">"20 分钟"</item>
-        <item msgid="4755209855817904977">"21 分钟"</item>
-        <item msgid="8414394445389367355">"22 分钟"</item>
-        <item msgid="2604612428763230265">"23 分钟"</item>
-        <item msgid="6871696471373403806">"24 分钟"</item>
-        <item msgid="1573685398431466364">"25 分钟"</item>
-        <item msgid="6999090368236684971">"26 分钟"</item>
-        <item msgid="7125056720603734703">"27 分钟"</item>
-        <item msgid="1695830988496463030">"28 分钟"</item>
-        <item msgid="6706610539793025916">"29 分钟"</item>
-        <item msgid="2898212818965905529">"30 分钟"</item>
-    </string-array>
-    <string name="week_start_title" msgid="4268917518596832096">"一周的第一天"</string>
-    <string-array name="week_start_entries">
-        <item msgid="9010198173394482639">"星期六"</item>
-        <item msgid="3993530639455360921">"星期日"</item>
-        <item msgid="8594709368683324282">"星期一"</item>
-    </string-array>
+    <string name="auto_silence_never" msgid="4821982647348750809">从不</string>
+    <string name="auto_silence_1_minute">1 分钟</string>
+    <string name="auto_silence_5_minutes">5 分钟</string>
+    <string name="auto_silence_10_minutes">10 分钟</string>
+    <string name="auto_silence_15_minutes">15 分钟</string>
+    <string name="auto_silence_20_minutes">20 分钟</string>
+    <string name="auto_silence_25_minutes">25 分钟</string>
+    <string name="label_off">关闭</string>
+    <string name="crescendo_5_seconds">5 秒</string>
+    <string name="crescendo_10_seconds">10 秒</string>
+    <string name="crescendo_15_seconds">15 秒</string>
+    <string name="crescendo_20_seconds">20 秒</string>
+    <string name="crescendo_30_seconds">30 秒</string>
+    <string name="crescendo_40_seconds">40 秒</string>
+    <string name="crescendo_50_seconds">50 秒</string>
+    <string name="crescendo_60_seconds">60 秒</string>
+    <string name="snooze_duration_1_minute">1 分钟</string>
+    <string name="snooze_duration_2_minutes">2 分钟</string>
+    <string name="snooze_duration_3_minutes">3 分钟</string>
+    <string name="snooze_duration_4_minutes">4 分钟</string>
+    <string name="snooze_duration_5_minutes">5 分钟</string>
+    <string name="snooze_duration_6_minutes">6 分钟</string>
+    <string name="snooze_duration_7_minutes">7 分钟</string>
+    <string name="snooze_duration_8_minutes">8 分钟</string>
+    <string name="snooze_duration_9_minutes">9 分钟</string>
+    <string name="snooze_duration_10_minutes">10 分钟</string>
+    <string name="snooze_duration_11_minutes">11 分钟</string>
+    <string name="snooze_duration_12_minutes">12 分钟</string>
+    <string name="snooze_duration_13_minutes">13 分钟</string>
+    <string name="snooze_duration_14_minutes">14 分钟</string>
+    <string name="snooze_duration_15_minutes">15 分钟</string>
+    <string name="snooze_duration_16_minutes">16 分钟</string>
+    <string name="snooze_duration_17_minutes">17 分钟</string>
+    <string name="snooze_duration_18_minutes">18 分钟</string>
+    <string name="snooze_duration_19_minutes">19 分钟</string>
+    <string name="snooze_duration_20_minutes">20 分钟</string>
+    <string name="snooze_duration_21_minutes">21 分钟</string>
+    <string name="snooze_duration_22_minutes">22 分钟</string>
+    <string name="snooze_duration_23_minutes">23 分钟</string>
+    <string name="snooze_duration_24_minutes">24 分钟</string>
+    <string name="snooze_duration_25_minutes">25 分钟</string>
+    <string name="snooze_duration_26_minutes">26 分钟</string>
+    <string name="snooze_duration_27_minutes">27 分钟</string>
+    <string name="snooze_duration_28_minutes">28 分钟</string>
+    <string name="snooze_duration_29_minutes">29 分钟</string>
+    <string name="snooze_duration_30_minutes">30 分钟</string>
+    <string name="week_start_title" msgid="4268917518596832096">本周开始于</string>
+    <string name="week_start_saturday">星期六</string>
+    <string name="week_start_sunday">星期日</string>
+    <string name="week_start_monday">星期一</string>
     <string name="alarm_volume_title" msgid="8506245173912428522">"闹钟音量"</string>
     <string name="silent_ringtone_title" msgid="6177287302898634765">"静音"</string>
     <string name="unknown_ringtone_title" msgid="6637522029614550112">"未知"</string>
-    <string name="alarm_volume_muted" msgid="6658289289695673569">"闹钟已设为静音"</string>
+    <string name="alarm_volume_muted" msgid="6658289289695673569">闹钟音量已静音</string>
     <string name="unmute_alarm_volume" msgid="2655009276035357497">"取消静音"</string>
-    <string name="silent_default_alarm_ringtone" msgid="6012855475009670997">"闹钟铃声默认为静音"</string>
+    <string name="silent_default_alarm_ringtone" msgid="6012855475009670997">默认闹钟铃声为静音</string>
     <string name="change_setting_action" msgid="1224356633832430160">"更改"</string>
-    <string name="alarms_blocked_by_dnd" msgid="6089433757505898969">"设备已设为“完全阻止”"</string>
+    <string name="alarms_blocked_by_dnd" msgid="6089433757505898969">设备设置为完全静音</string>
     <string name="volume_button_setting_title" msgid="6937131248843413357">"音量按钮"</string>
-    <string-array name="volume_button_setting_entries">
-        <item msgid="7972756698723318690">"暂停"</item>
-        <item msgid="3450979320164769576">"关闭"</item>
-        <item msgid="7085774139907653538">"控制音量"</item>
-    </string-array>
+    <string name="button_action_snooze">暂停</string>
+    <string name="button_action_dismiss">关闭</string>
+    <string name="button_action_control_volume">控制音量</string>
+    <string name="button_action_nothing">无</string>
     <string name="label_description" msgid="8736179296142915727">"标签"</string>
     <string name="ringtone_description" msgid="7580922112921069925">"铃声"</string>
     <string name="menu_alarm" msgid="4772010125376647519">"闹钟"</string>
@@ -179,7 +155,7 @@
     <string name="menu_stopwatch" msgid="3396117705293574701">"秒表"</string>
     <string name="button_alarms" msgid="3907838219512538763">"添加闹钟"</string>
     <string name="button_cities" msgid="4555761857494501363">"城市"</string>
-    <string name="screensaver_settings_title" msgid="2930695838866189483">"屏保"</string>
+    <string name="screensaver_settings_title" msgid="2930695838866189483">屏幕保护程序</string>
     <string name="menu_item_sort_by_gmt_offset" msgid="3120860422682721706">"按时间排序"</string>
     <string name="menu_item_sort_by_name" msgid="1762931290495104106">"按名称排序"</string>
     <string name="selected_cities_label" msgid="3607479399424246605">"所选城市"</string>
@@ -192,62 +168,57 @@
     <string name="hours_label" msgid="3393478155635368097">"小时"</string>
     <string name="minutes_label" msgid="3568098128251438588">"分"</string>
     <string name="seconds_label" msgid="124655952824003246">"秒"</string>
-    <string name="timer_setup_description" msgid="2488277921227564704">"<xliff:g id="HOURS">%1$s</xliff:g> <xliff:g id="MINUTES">%2$s</xliff:g> <xliff:g id="SECONDS">%3$s</xliff:g>"</string>
-    <string name="lap_number_single_digit" msgid="1051159504304610877">"# <xliff:g id="LAPNUMBER">%d</xliff:g>"</string>
-    <string name="lap_number_double_digit" msgid="2138536756534362037">"# <xliff:g id="LAPNUMBER">%02d</xliff:g>"</string>
-    <string name="sw_share_main" msgid="7703563468204234405">"我的时间：<xliff:g id="TIME">%s</xliff:g>"</string>
+    <string name="timer_setup_description" msgid="2488277921227564704"><xliff:g example="1 hour" id="hours">%1$s</xliff:g>, <xliff:g example="15 minutes" id="minutes">%2$s</xliff:g>, <xliff:g example="30 seconds" id="seconds">%3$s</xliff:g></string>
+    <string name="lap_number_single_digit" msgid="1051159504304610877"># <xliff:g id="lapNumber">%d</xliff:g></string>
+    <string name="lap_number_double_digit" msgid="2138536756534362037"># <xliff:g id="lapNumber">%02d</xliff:g></string>
+    <string name="sw_share_main" msgid="7703563468204234405">我的时间是 <xliff:g id="time">%s</xliff:g></string>
     <string name="sw_share_laps" msgid="614390674795945007">"各圈时间："</string>
-    <string name="sw_notification_lap_number" msgid="3535420316052647126">"第<xliff:g id="NUMBER">%d</xliff:g>圈"</string>
+    <string name="sw_notification_lap_number" msgid="3535420316052647126">第 <xliff:g id="number">%d</xliff:g> 圈</string>
     <string name="timer_add_timer" msgid="862733633862574752">"添加定时器"</string>
     <string name="timer_start" msgid="6158486445614356442">"开始"</string>
     <string name="timer_delete" msgid="8699122001991909302">"删除"</string>
-    <string name="timer_descriptive_delete" msgid="8794915342760383536">"删除 <xliff:g id="NUMBER_STRING">%s</xliff:g>"</string>
-    <string name="timer_plus_one" msgid="6631211310420106116">"增加1分钟"</string>
-    <string name="timer_add_minute" msgid="207816824783281446">"+ 1:00"</string>
-    <string name="timer_plus_1_min" msgid="8645224089494875062">"加上1分钟"</string>
+    <string name="timer_descriptive_delete" msgid="8794915342760383536">删除 <xliff:g id="number_string">%s</xliff:g></string>
+    <string name="timer_add_custom_time_description" msgid="6631211310420106116">添加 %s 分钟</string>
+    <string name="timer_add_custom_time_for_notification" msgid="8645224089494875062">添加 %s 分钟</string>
     <string name="timer_stop" msgid="3361154678667736722">"停止"</string>
     <string name="timer_stop_all" msgid="9080780442843034376">"停止所有定时器"</string>
     <string name="timer_reset" msgid="7848424809190171640">"重置"</string>
     <string name="timer_cancel" msgid="3572868404230815644">"取消"</string>
-    <string name="timer_canceled" msgid="7327923392567128060">"已取消定时器"</string>
+    <string name="timer_canceled" msgid="7327923392567128060">定时器已取消</string>
     <string name="timer_times_up" msgid="9190440395938519009">"时间到"</string>
-    <string name="timer_multi_times_up" msgid="1239104626836080409">"<xliff:g id="NUM_TIMERS">%d</xliff:g> 个定时器已到期"</string>
-    <string name="timer_multi_missed" msgid="9085073572920385362">"错过了 <xliff:g id="NUMBER">%d</xliff:g> 个定时器"</string>
+    <string name="timer_multi_times_up" msgid="1239104626836080409"><xliff:g example="2" id="NUM_TIMERS">%d</xliff:g> 个定时器已到期</string>
+    <string name="timer_multi_missed" msgid="9085073572920385362"><xliff:g example="2" id="number">%d</xliff:g> 个定时器已错过</string>
     <string name="timer_notification_label" msgid="4933184831583137249">"定时器"</string>
-    <string name="missed_named_timer_notification_label" msgid="665604640028289175">"错过的定时器：<xliff:g id="NAME">%s</xliff:g>"</string>
+    <string name="missed_named_timer_notification_label" msgid="665604640028289175">错过的定时器：<xliff:g example="Pick up kids" id="name">%s</xliff:g></string>
     <string name="timer_pause" msgid="3748323712728398743">"暂停"</string>
     <string name="timer_reset_all" msgid="7530633132757866087">"重置所有定时器"</string>
-    <string name="hours_minutes_seconds" msgid="5680088738059791288">"<xliff:g id="HOURS">%1$d</xliff:g>:<xliff:g id="MINUTES">%2$02d</xliff:g>:<xliff:g id="SECONDS">%3$02d</xliff:g>"</string>
-    <string name="minutes_seconds" msgid="6189446107009577914">"<xliff:g id="MINUTES">%1$d</xliff:g>:<xliff:g id="SECONDS">%2$02d</xliff:g>"</string>
+    <string name="hours_minutes_seconds" msgid="5680088738059791288"><xliff:g example="2" id="hours">%1$d</xliff:g>:<xliff:g example="3" id="minutes">%2$02d</xliff:g>:<xliff:g example="44" id="seconds">%3$02d</xliff:g></string>
+    <string name="minutes_seconds" msgid="6189446107009577914"><xliff:g example="3" id="minutes">%1$d</xliff:g>:<xliff:g example="44" id="seconds">%2$02d</xliff:g></string>
     <!-- no translation found for seconds (6550091082396571898) -->
-    <skip />
-    <string-array name="sw_share_strings">
-        <item msgid="842841032273927988">"您简直就像闪电侠。"</item>
-        <item msgid="6332879039890727169">"享受一下您大汗淋漓的成果吧。"</item>
-        <item msgid="815382761274660130">"Android 以速度快著称，但还跟不上您！"</item>
-        <item msgid="7916250650982813737">"哇噻！"</item>
-        <item msgid="6836603904515182333">"果然是高手。"</item>
-        <item msgid="7508085100680861631">"迅雷不及掩耳之势。"</item>
-        <item msgid="5961245252909589573">"再来一次吧。"</item>
-        <item msgid="5211891900854545940">"小菜一碟。"</item>
-        <item msgid="9071353477103826053">"您简直比得上飞毛腿。"</item>
-        <item msgid="3785193933691117181">"冲击光速！"</item>
-    </string-array>
-    <string name="home_label" msgid="4436139365695453870">"家"</string>
+    <skip/>
+    <string name="jocular_content_message_1">"您简直就像闪电侠。"</string>
+    <string name="jocular_content_message_2">"享受一下您大汗淋漓的成果吧。"</string>
+    <string name="jocular_content_message_3">"Android 以速度快著称，但还跟不上您！"</string>
+    <string name="jocular_content_message_4">"哇噻！"</string>
+    <string name="jocular_content_message_5">"果然是高手。"</string>
+    <string name="jocular_content_message_6">"迅雷不及掩耳之势。"</string>
+    <string name="jocular_content_message_7">"再来一次吧。"</string>
+    <string name="jocular_content_message_8">"小菜一碟。"</string>
+    <string name="jocular_content_message_9">"您简直比得上飞毛腿。"</string>
+    <string name="jocular_content_message_10">"冲击光速！"</string>
+    <string name="home_label" msgid="4436139365695453870">家乡</string>
     <string name="cities_activity_title" msgid="8552462751129256730">"城市"</string>
     <string name="clock_settings" msgid="8317286807280600391">"时钟"</string>
-    <string name="clock_style" msgid="2265011060429742344">"样式"</string>
+    <string name="clock_style" msgid="2265011060429742344">风格</string>
     <string name="display_clock_seconds_pref" msgid="691506643469501643">"显示含秒数的时间"</string>
     <string name="open_date_settings" msgid="7712226973337806152">"更改日期和时间"</string>
-    <string-array name="clock_style_entries">
-        <item msgid="917900462224167608">"指针"</item>
-        <item msgid="8483930821046925592">"数字"</item>
-    </string-array>
-    <string name="automatic_home_clock" msgid="6274174710735449252">"自动显示家中时间"</string>
-    <string name="automatic_home_clock_summary" msgid="6020476321040807273">"在其他时区旅行时显示家中时间"</string>
-    <string name="home_time_zone" msgid="9199730676287974501">"家中时区"</string>
-    <string name="city_checked" msgid="616847871968019">"已选中<xliff:g id="CITY_NAME">%s</xliff:g>"</string>
-    <string name="city_unchecked" msgid="710212932781145918">"已取消选中<xliff:g id="CITY_NAME">%s</xliff:g>"</string>
+    <string name="clock_style_analog">指针</string>
+    <string name="clock_style_digital">数字</string>
+    <string name="automatic_home_clock" msgid="6274174710735449252">自动显示家乡时钟</string>
+    <string name="automatic_home_clock_summary" msgid="6020476321040807273">在时差地区旅行时，添加家乡时钟</string>
+    <string name="home_time_zone" msgid="9199730676287974501">家乡时区</string>
+    <string name="city_checked" msgid="616847871968019"><xliff:g id="city_name">%s</xliff:g> 已选中</string>
+    <string name="city_unchecked" msgid="710212932781145918"><xliff:g id="city_name">%s</xliff:g> 已取消选中</string>
     <string-array name="timezone_labels">
         <item msgid="5495601234086197399">"马绍尔群岛"</item>
         <item msgid="4196408495909011020">"中途岛"</item>
@@ -336,42 +307,41 @@
         <item msgid="5176858645450908751">"雅加达"</item>
     </string-array>
     <string name="shortcut_new_alarm_short" msgid="3490418929139725538">"新闹钟"</string>
-    <string name="shortcut_new_alarm_long" msgid="4778064830147981089">"设置新闹钟"</string>
+    <string name="shortcut_new_alarm_long" msgid="4778064830147981089">创建新闹钟</string>
     <string name="shortcut_new_timer_short" msgid="3793414543219297884">"新定时器"</string>
-    <string name="shortcut_new_timer_long" msgid="5194092459678096067">"设置新定时器"</string>
+    <string name="shortcut_new_timer_long" msgid="5194092459678096067">创建新定时器</string>
     <string name="shortcut_start_stopwatch_short" msgid="5469715764277476796">"启动"</string>
     <string name="shortcut_start_stopwatch_long" msgid="9183061797046030376">"启动秒表"</string>
     <string name="shortcut_pause_stopwatch_short" msgid="4022667323693785830">"暂停"</string>
     <string name="shortcut_pause_stopwatch_long" msgid="435026905074898334">"暂停秒表"</string>
-    <string name="shortcut_start_screensaver_short" msgid="3414762073311954753">"屏保"</string>
-    <string name="shortcut_start_screensaver_long" msgid="6134275671119484907">"启动屏保"</string>
+    <string name="shortcut_start_screensaver_short" msgid="3414762073311954753">屏幕保护程序</string>
+    <string name="shortcut_start_screensaver_long" msgid="6134275671119484907">启动屏幕保护程序</string>
     <string name="alarm_settings" msgid="2947147071388290814">"闹钟"</string>
-    <string name="timer_service_desc" msgid="2256002649882602433">"处理可通过定时器通知执行的操作。"</string>
-    <string name="stopwatch_service_desc" msgid="9220132827343760767">"处理可通过秒表通知执行的操作。"</string>
+    <string name="timer_service_desc" msgid="2256002649882602433">处理来自定时器通知的操作。</string>
+    <string name="stopwatch_service_desc" msgid="9220132827343760767">处理来自秒表通知的操作。</string>
     <string name="swn_paused" msgid="6364358842808263589">"已暂停"</string>
-    <string name="description_direction_right" msgid="5709209043267548985">"向右滑动可关闭闹钟"</string>
-    <string name="description_direction_left" msgid="7448141043674998679">"向左滑动可暂停闹钟"</string>
-    <string name="description_direction_both" msgid="1841309486023845685">"向左滑动可暂停，向右滑动可关闭"</string>
+    <string name="description_direction_right" msgid="5709209043267548985">向右滑动以关闭</string>
+    <string name="description_direction_left" msgid="7448141043674998679">向左滑动以暂停</string>
+    <string name="description_direction_both" msgid="1841309486023845685">向左滑动以暂停，向右滑动以关闭</string>
     <string name="timer_settings" msgid="7955522143086154795">"定时器"</string>
     <string name="timer_vibrate_title" msgid="7788920024785587518">"定时器振动"</string>
     <string name="timer_paused" msgid="5941160896040771462">"定时器已暂停"</string>
-    <string name="timers_stopped" msgid="3186191253226005149">"<xliff:g id="NUMBER">%d</xliff:g> 个定时器已暂停"</string>
-    <string name="all_timers_stopped_notif" msgid="883027111895833440">"点按即可查看您的定时器"</string>
-    <string name="timers_in_use" msgid="5570729467344408506">"<xliff:g id="NUMBER">%d</xliff:g>个定时器"</string>
-    <string name="next_timer_notif" msgid="6136454740115613653">"下一个定时器：<xliff:g id="TIME_REMAINING">%s</xliff:g>"</string>
-    <string name="screensaver_settings" msgid="1780742944194267226">"屏保设置"</string>
+    <string name="timers_stopped" msgid="3186191253226005149"><xliff:g example="7" id="number">%d</xliff:g> 个定时器已暂停</string>
+    <string name="all_timers_stopped_notif" msgid="883027111895833440">点击查看您的定时器</string>
+    <string name="timers_in_use" msgid="5570729467344408506"><xliff:g example="7" id="number">%d</xliff:g> 个定时器</string>
+    <string name="next_timer_notif" msgid="6136454740115613653">下一个定时器：<xliff:g example="2 minutes remaining" id="time_remaining">%s</xliff:g></string>
     <string name="expand_alarm" msgid="7392616528943305020">"展开闹钟"</string>
-    <string name="collapse_alarm" msgid="3561772046433483980">"收起闹钟"</string>
-    <string name="alarm_undo" msgid="5710042601177655254">"撤消"</string>
+    <string name="collapse_alarm" msgid="3561772046433483980">折叠闹钟</string>
+    <string name="alarm_undo" msgid="5710042601177655254">撤销</string>
     <string name="alarm_deleted" msgid="6131529309389084785">"闹钟已删除"</string>
-    <string name="world_day_of_week_label" msgid="5911196322328341288">"/ <xliff:g id="LABEL">%s</xliff:g>"</string>
-    <string name="world_time_ahead" msgid="625559988238637652">"早 <xliff:g id="TIME">%1$s</xliff:g>"</string>
-    <string name="world_time_behind" msgid="5395771290726167865">"晚 <xliff:g id="TIME">%1$s</xliff:g>"</string>
-    <string name="world_hours_minutes_ahead" msgid="5132012793021696377">"早 <xliff:g id="HOURS">%1$s</xliff:g> <xliff:g id="MINUTES">%2$s</xliff:g>"</string>
-    <string name="world_hours_minutes_behind" msgid="8978567362140923698">"晚 <xliff:g id="HOURS">%1$s</xliff:g> <xliff:g id="MINUTES">%2$s</xliff:g>"</string>
-    <string name="world_hours_tomorrow" msgid="2504465609269004794">"明天，<xliff:g id="TIME">%1$s</xliff:g>"</string>
-    <string name="world_hours_yesterday" msgid="4425086322610882745">"昨天，<xliff:g id="TIME">%1$s</xliff:g>"</string>
-    <string name="next_alarm_description" msgid="2650244835760747046">"下次闹钟时间：<xliff:g id="ALARM_TIME">%s</xliff:g>"</string>
+    <string name="world_day_of_week_label" msgid="5911196322328341288">/ <xliff:g id="label">%s</xliff:g></string>
+    <string name="world_time_ahead" msgid="625559988238637652">提前 <xliff:g example="6 hours" id="time">%1$s</xliff:g></string>
+    <string name="world_time_behind" msgid="5395771290726167865">落后 <xliff:g example="4 hours" id="time">%1$s</xliff:g></string>
+    <string name="world_hours_minutes_ahead" msgid="5132012793021696377">提前 <xliff:g example="6 hr" id="hours">%1$s</xliff:g> <xliff:g example="30 min" id="minutes">%2$s</xliff:g></string>
+    <string name="world_hours_minutes_behind" msgid="8978567362140923698">落后 <xliff:g example="4 hr" id="hours">%1$s</xliff:g> <xliff:g example="30 min" id="minutes">%2$s</xliff:g></string>
+    <string name="world_hours_tomorrow" msgid="2504465609269004794">明天，<xliff:g example="6 hours ahead" id="time">%1$s</xliff:g></string>
+    <string name="world_hours_yesterday" msgid="4425086322610882745">昨天，<xliff:g example="4 hours behind" id="time">%1$s</xliff:g></string>
+    <string name="next_alarm_description" msgid="2650244835760747046">下次闹钟：<xliff:g example="Wed 8:00am" id="alarm_time">%s</xliff:g></string>
     <string name="no_alarms" msgid="6429431324842022917">"没有闹钟"</string>
     <string name="invalid_time" msgid="2782334750243998633">"时间无效：<xliff:g id="INVALID_AMPM">%3$s</xliff:g> <xliff:g id="INVALID_HOUR">%1$d</xliff:g>:<xliff:g id="INVALID_MINUTES">%2$d</xliff:g>"</string>
     <string name="no_alarm_at" msgid="8140632482969193119">"未设置 <xliff:g id="ALARM_TIME_HOUR">%1$d</xliff:g>:<xliff:g id="ALARM_TIME_MINUTES">%2$d</xliff:g> 的闹钟"</string>
@@ -396,15 +366,291 @@
     <string name="alarm_is_snoozed" msgid="7044644119744928846">"<xliff:g id="ALARM_TIME">%s</xliff:g> 的闹钟已延后 10 分钟"</string>
     <string name="flip_action_title">设备翻转行为</string>
     <string name="shake_action_title">设备摇晃行为</string>
-    <string-array name="action_setting_entries">
-        <item>贪睡</item>
-        <item>忽略</item>
-        <item>无</item>
-    </string-array>
-    <string name="firing_alarms_timers_channel">触发闹钟和计时器</string>
+    <string name="firing_alarms_timers_channel">触发闹钟和定时器</string>
     <string name="alarm_missed_channel">错过的闹钟</string>
     <string name="alarm_snooze_channel">暂停的闹钟</string>
-    <string name="alarm_upcoming_channel">即将响铃的闹钟</string>
-    <string name="stopwatch_channel">计时器</string>
-    <string name="timer_channel">计时器</string>
+    <string name="alarm_upcoming_channel">预定的闹钟</string>
+    <string name="stopwatch_channel">秒表</string>
+    <string name="timer_channel">定时器</string>
+    <string name="auto_silence_at_the_end_of_the_ringtone">铃声结束</string>
+    <string name="menu_bedtime">就寝时间</string>
+    <string name="digital_widget_clock_custom_color_title">主时钟自定义颜色</string>
+    <string name="permission_requirement_title">必要： </string>
+    <string name="permission_highly_recommended">强烈推荐</string>
+    <string name="ignore_battery_optimizations_dialog_title">电池优化</string>
+    <string name="first_launch_button_later">稍后</string>
+    <string name="first_launch_button_now">现在</string>
+    <string name="first_launch_main_feature_title">主要特点</string>
+    <string name="app_slogan">基于 AOSP 的 100% FOSS 时钟</string>
+    <string name="permission_dialog_revoke_title">撤销访问权限</string>
+    <string name="duplicate">重复</string>
+    <string name="selected">已选择</string>
+    <string name="more_options">更多选项</string>
+    <string name="about_title">关于</string>
+    <string name="version">版本</string>
+    <string name="bedtime_channel">就寝时间</string>
+    <string name="material_you_digital_widget">数字时钟 Material You</string>
+    <string name="enable_alarm_vibrations_by_default_setting_title">创建闹钟时启用振动</string>
+    <string name="version_text">版本 <xliff:g id="VERSION_NUMBER" example="1.0">%1$s</xliff:g></string>
+    <string name="notifications_dialog_text">除了设置闹钟外，这款应用还具有定时器、秒表和就寝模式。
+\n
+\n为了使所有模块的通知都能正确显示，尤其是为了触发闹钟，我们建议为此应用激活通知。</string>
+    <string name="FSN_dialog_text">自 Android 14 以来，为了在屏幕关闭时触发闹钟，必须启用全屏通知权限</string>
+    <string name="notifications_permission_title">启用通知</string>
+    <string name="notifications_dialog_title">通知</string>
+    <string name="FSN_permission_title">启用全屏通知</string>
+    <string name="FSN_dialog_title">全屏通知</string>
+    <string name="ignore_battery_optimizations_dialog_text">默认情况下，Android 系统将所有用户安装的应用配置为优化以节省电池寿命。
+\n
+\n虽然这对于许多应用来说是可以接受的，但此应用是一款闹钟应用，如果配置为优化电池，通常会导致问题。一旦启用，Android 系统可以随时终止此应用和/或取消其已安排的闹钟，这将对应用的运行产生不利影响。
+\n
+\n我们建议将此应用列入电池优化白名单。</string>
+    <string name="analog_widget_material_you">指针时钟 Material You</string>
+    <string name="settings_permission_message">一个或多个基本权限被拒绝。不授予它们可能会导致故障。</string>
+    <string name="display_card_background_summary">显示某些应用程序元素（闹钟、城市、定时器按钮等）的背景</string>
+    <string name="about_dialog_message">• 翻转和摇动操作可关闭/推迟闹钟；\n\n• 使用电源按钮或音量按钮关闭/推迟闹钟；\n\n• 仅适用于某些骁龙处理器设备，设备关机时会触发闹钟；\n\n• 滑动以删除闹钟；\n\n• 重复闹钟；\n\n• 自定义闹钟标题；\n\n• 可自定义铃声；\n\n• 浅色、深色或系统主题；\n\n• 深色主题的 AMOLED 模式；\n\n• 数字或指针时钟风格；\n\n• 旅行时显示家乡时间；\n\n• 显示世界各地许多城市的时间；\n\n• 包括定时器、秒表和就寝时间<i>（实验性）</i>；\n\n• 可以与联系人共享秒表；\n\n• 可自定义的屏幕保护程序；\n\n• 现代微件；\n\n• 可自定义的微件；\n\n• 备份和还原设置；\n\n• Material 设计；\n\n• 适用于 Android 12+ 的动态色彩；</string>
+    <string name="bedtime_reminder_notification_text">您的就寝时间将于 <xliff:g id="sleep_time">%2$s</xliff:g> 睡眠后 <xliff:g id="wake_time">%1$s</xliff:g> 停止。</string>
+    <string name="first_launch_main_feature_message">► 浅色、深色或系统主题；&lt;br&gt; &lt;br&gt; ► 可自定义的屏幕保护程序；&lt;br&gt; &lt;br&gt; ► 可自定义的微件；&lt;br&gt; &lt;br&gt; ► Material 设计和动态色彩；&lt;br&gt; &lt;br&gt; ► 滑动以删除闹钟；&lt;br&gt; &lt;br&gt; ► 重复闹钟；&lt;br&gt; &lt;br&gt; ► 翻转和摇动操作可关闭/推迟闹钟；&lt;br&gt; &lt;br&gt; ► 使用电源按钮或音量按钮关闭/推迟闹钟；&lt;br&gt; &lt;br&gt; ► %s</string>
+    <string name="alarm_notification_reminder_title">通知提醒</string>
+    <string name="about_github_link">在 GitHub 查看</string>
+    <string name="alarm_settings_summary">设置默认铃声、音量、关闭或暂停闹钟的操作、每周的第一天和提醒通知时间</string>
+    <string name="description_direction_left_for_non_repeatable_alarm">向左滑动以关闭</string>
+    <string name="material_time_picker_style_title">时间选择器风格</string>
+    <string name="timer_label_box_title">定时器标签</string>
+    <string name="whats_new_title">更新日志</string>
+    <string name="alarm_created">闹钟已创建</string>
+    <string name="first_launch_important_info_message">为了确保应用程序正常工作，&lt;b&gt;必须更改某些设备设置：&lt;/b&gt; &lt;br&gt; &lt;br&gt; • &lt;b&gt;电池优化；&lt;/b&gt; &lt;br&gt; &lt;br&gt; • &lt;b&gt;通知；&lt;/b&gt; &lt;br&gt; &lt;br&gt; %s &lt;i&gt;根据设备的 Android 版本，其中一些设置已经过优化（例如通知）。&lt;/i&gt; &lt;br&gt; &lt;br&gt; 您可以现在或以后在权限管理设置中更改它们：</string>
+    <string name="keep_timer_screen_on_title">如果显示定时器，请保持屏幕打开</string>
+    <string name="first_launch_main_feature_link">…还有更多！</string>
+    <string name="screensaver_italic_date_title">斜体日期</string>
+    <string name="background_color_title">背景颜色</string>
+    <string name="digital_widget_city_title">在微件上显示城市</string>
+    <string name="digital_widget_city_clock_custom_color_title">城市时钟自定义颜色</string>
+    <string name="digital_widget_city_name_custom_color_title">城市名称自定义颜色</string>
+    <string name="bedtime_notification_until">直到 <xliff:g id="wake_time">%s</xliff:g></string>
+    <string name="permission_management_summary">显示应用程序正常工作所需的权限</string>
+    <string name="swipe_action_title">滑动以关闭或暂停闹钟</string>
+    <string name="power_button_title">电源按钮</string>
+    <string name="add_label">添加标签</string>
+    <string name="clock_settings_summary">设置风格、时区和更改设备日期和时间</string>
+    <string name="timer_add_custom_time">+ %s</string>
+    <string name="timer_button_time_box_title">添加到定时器的分钟数</string>
+    <string name="features_title">主要特点</string>
+    <string name="license">开源许可证</string>
+    <string name="gnu_gpl">GNU 通用公共许可证 v3.0</string>
+    <string name="contributors">贡献者</string>
+    <string name="credits">致谢</string>
+    <string name="dialog_close">关闭</string>
+    <string name="bedtime_service_desc">处理来自就寝时间通知的操作。</string>
+    <string name="description_direction_both_for_non_repeatable_alarm">向左或向右滑动以关闭</string>
+    <string name="description_direction_both_for_non_repeatable_alarm_clicked">单击左键或右键以关闭</string>
+    <string name="timer_settings_summary">设置默认铃声、音量和定时器排序</string>
+    <string name="default_time_to_add_to_timer_title">添加到定时器的默认时间</string>
+    <string name="screensaver_settings_summary">设置屏幕保护程序的风格、颜色和字体</string>
+    <string name="screensaver_daydream_settings">选择/启用屏幕保护程序</string>
+    <string name="screensaver_daydream_settings_summary">打开主要的 Android 屏幕保护程序设置</string>
+    <string name="screensaver_clock_dynamic_colors_title">动态时钟颜色</string>
+    <string name="clock_color_title">时钟颜色</string>
+    <string name="screensaver_date_color_title">日期颜色</string>
+    <string name="screensaver_brightness_title">亮度</string>
+    <string name="screensaver_bold_digital_clock_title">粗体数字时钟</string>
+    <string name="screensaver_italic_digital_clock_title">斜体数字时钟</string>
+    <string name="screensaver_bold_date_title">粗体日期</string>
+    <string name="preview_title">预览</string>
+    <string name="screensaver_preview_summary">立即启动屏幕保护程序</string>
+    <string name="description_direction_both_clicked">单击左键以暂停，单击右键以关闭</string>
+    <string name="screensaver_next_alarm_color_title">下次闹钟颜色</string>
+    <string name="screensaver_bold_next_alarm_title">粗体下次闹钟</string>
+    <string name="screensaver_italic_next_alarm_title">斜体下次闹钟</string>
+    <string name="wakeup">唤醒</string>
+    <string name="bedtime_reminder_notification">提醒通知</string>
+    <string name="bedtime_reminder_notification_title">您的就寝时间开始于 <xliff:g id="bed_time">%1$s</xliff:g></string>
+    <string name="bedtime_notification_title">“就寝时间”模式已打开</string>
+    <string name="bedtime_notification_action_pause">暂停 30 分钟</string>
+    <string name="bedtime_notification_action_turn_off">关掉</string>
+    <string name="bedtime_paused_notification_title">“就寝时间”模式已暂停</string>
+    <string name="bedtime_notification_resume">在 <xliff:g id="time">%1$s</xliff:g> 继续</string>
+    <string name="bedtime_notification_resume_action">现在继续</string>
+    <string name="wakeup_alarm_label_visible">唤醒闹钟</string>
+    <string name="new_bedtime_alarm">唤醒闹钟已创建</string>
+    <string name="sleeping_time">睡眠时间：%1$s</string>
+    <string name="no_bedtime_alarm">没有设置就寝时间</string>
+    <string name="no_wakeup_alarm">没有设置唤醒闹钟</string>
+    <string name="first_launch_version">版本 %s</string>
+    <string name="first_launch_important_info_title">重要信息</string>
+    <string name="first_launch_dialog_title">退出</string>
+    <string name="first_launch_dialog_message">是否确定要离开应用程序？</string>
+    <string name="widget_background_title">显示背景</string>
+    <string name="digital_widget_clock_default_color_title">使用主时钟的默认颜色</string>
+    <string name="digital_widget_date_default_color_title">使用日期的默认颜色</string>
+    <string name="digital_widget_date_custom_color_title">日期自定义颜色</string>
+    <string name="digital_widget_city_clock_default_color_title">使用城市时钟的默认颜色</string>
+    <string name="digital_widget_city_name_default_color_title">使用城市名称的默认颜色</string>
+    <string name="digital_widget_max_clock_font_size_title">主时钟的最大字体大小</string>
+    <string name="widget_max_clock_font_size_summary">最大字体大小 = </string>
+    <string name="digital_widget_message_summary">必须禁用微件上的显示城市才能访问此设置</string>
+    <string name="permission_management_settings">权限管理</string>
+    <string name="first_launch_important_info_message_for_SDK34">• &lt;b&gt;全屏通知；&lt;/b&gt; &lt;br&gt; &lt;br&gt;</string>
+    <string name="widget_next_alarm_default_color_title">下次闹钟使用默认颜色</string>
+    <string name="widget_next_alarm_custom_color_title">下次闹钟自定义颜色</string>
+    <string name="enable_alarm_snooze_actions_label">启用闹钟暂停操作</string>
+    <string name="alarm_label_box_title">闹钟标签</string>
+    <string name="alarm_inactive">已关闭</string>
+    <string name="dismiss_alarm_ringtone_when_ringtone_ends_label">铃声结束时关闭闹钟</string>
+    <string name="settings_permission_summary">单击此处显示权限管理页面。</string>
+    <string name="style_category_title">风格</string>
+    <string name="styles_and_colors_category_title">风格和颜色</string>
+    <string name="font_category_title">字体</string>
+    <string name="miscellaneous_category_title">杂项</string>
+    <string name="ringtone_category_title">铃声</string>
+    <string name="actions_category_title">操作</string>
+    <string name="interface_customization_settings">界面</string>
+    <string name="interface_customization_summary">设置应用于应用程序的风格和颜色</string>
+    <string name="title_theme">主题</string>
+    <string name="title_accent_color">强调色</string>
+    <string name="title_dark_theme_mode">深色主题模式</string>
+    <string name="display_card_background_title">显示卡片背景</string>
+    <string name="display_background_border_title">显示背景边框</string>
+    <string name="settings_vibration_title">启用振动</string>
+    <string name="settings_vibration_summary">只有一些界面按钮受到影响（例如：定时器播放/暂停按钮或开关）</string>
+    <string name="display_background_border_summary">显示某些应用程序元素（闹钟、城市、定时器按钮等）的背景边框</string>
+    <string name="ignore_battery_optimizations_title">忽略电池优化</string>
+    <string name="permission_denied">已拒绝</string>
+    <string name="permission_dialog_close_button">关闭</string>
+    <string name="revoke_permission_dialog_message">是否确定要撤销此权限？</string>
+    <string name="permission_status_title">状态： </string>
+    <string name="permission_granted">已授予</string>
+    <string name="alarm_display_customization_title">自定义闹钟显示</string>
+    <string name="snooze_button_color">暂停按钮颜色</string>
+    <string name="dismiss_button_color">关闭按钮颜色</string>
+    <string name="alarm_button_color">闹钟按钮颜色</string>
+    <string name="pulse_color">脉冲颜色</string>
+    <string name="transparent_background_for_expired_timer_title">定时器到期时的透明背景</string>
+    <string name="alarm_title_color">闹钟标题颜色</string>
+    <string name="seconds_hand_color_title">秒针颜色</string>
+    <string name="alarm_clock_font_size">闹钟字体大小</string>
+    <string name="alarm_title_font_size">闹钟标题字体大小</string>
+    <string name="whats_new_dialog_message">了解更新内容：
+\n
+\n%s</string>
+    <string name="github_dialog_message">访问项目的 GitHub 页面：
+\n
+\n%s</string>
+    <string name="license_dialog_message">阅读许可证：
+\n
+\n%s</string>
+    <string name="contributors_dialog_message">访问 %1$s 的 GitHub 页面：
+\n
+\n%2$s</string>
+    <string name="material_you_vertical_digital_widget">立式数字时钟 Material You</string>
+    <string name="widgets_settings">微件</string>
+    <string name="vertical_digital_widget">立式数字时钟</string>
+    <string name="digital_widget_custom_hours_color_title">自定义小时颜色</string>
+    <string name="digital_widget_default_minutes_color_title">使用分钟默认颜色</string>
+    <string name="digital_widget_default_hours_color_title">使用小时默认颜色</string>
+    <string name="digital_widget_custom_minutes_color_title">自定义分钟颜色</string>
+    <string name="standard_category_title">标准</string>
+    <string name="material_you_category_title">Material You</string>
+    <string name="widgets_settings_summary">设置微件的样式、颜色和字体大小</string>
+    <string name="settings_tab_indicator_title">在底部导航菜单中显示选项卡指示</string>
+    <string name="material_you_next_alarm_widget">下次闹钟 Material You</string>
+    <string name="next_alarm_widget_custom_title_color">“下次闹钟”和“没有预定的闹钟”标题自定义颜色</string>
+    <string name="next_alarm_widget_default_alarm_title_color">使用默认颜色作为闹钟标题</string>
+    <string name="next_alarm_widget_custom_alarm_title_color">闹钟标题自定义颜色</string>
+    <string name="next_alarm_widget_max_font_size_title">微件最大字体大小</string>
+    <string name="next_alarm_widget_text">下次闹钟</string>
+    <string name="next_alarm_widget_title_no_alarm">没有预定的闹钟</string>
+    <string name="next_alarm_widget_default_title_color">为“下次闹钟”和“没有预定的闹钟”标题使用默认颜色</string>
+    <string name="settings_fade_transitions_title">切换屏幕时启用淡入淡出过渡</string>
+    <string name="next_alarm_widget">下次闹钟</string>
+    <string name="sort_timer_title">排序定时器</string>
+    <string name="denied_permission_label">权限已拒绝</string>
+    <string name="label_default">默认</string>
+    <string name="light_theme">浅色</string>
+    <string name="dark_theme">深色</string>
+    <string name="system_theme">系统</string>
+    <string name="blue_gray_accent_color">蓝灰色</string>
+    <string name="brown_accent_color">棕色</string>
+    <string name="green_accent_color">绿色</string>
+    <string name="indigo_accent_color">靛蓝色</string>
+    <string name="orange_accent_color">橙色</string>
+    <string name="pink_accent_color">粉红色</string>
+    <string name="red_accent_color">红色</string>
+    <string name="amoled_dark_theme_mode">AMOLED</string>
+    <string name="alarm_notification_reminder_30_minutes">30 分钟前</string>
+    <string name="alarm_notification_reminder_1_hour">1 小时前</string>
+    <string name="alarm_notification_reminder_2_hours">2 小时前</string>
+    <string name="alarm_notification_reminder_4_hours">4 小时前</string>
+    <string name="alarm_notification_reminder_6_hours">6 小时前</string>
+    <string name="alarm_notification_reminder_8_hours">8 小时前</string>
+    <string name="alarm_notification_reminder_10_hours">10 小时前</string>
+    <string name="alarm_notification_reminder_12_hours">12 小时前</string>
+    <string name="sort_timer_ascending_duration">按持续时间（升序）</string>
+    <string name="sort_timer_descending_duration">按持续时间（降序）</string>
+    <string name="sort_timer_name">按名称</string>
+    <string name="default_time_to_add_to_timer_1_minute">1 分钟</string>
+    <string name="default_time_to_add_to_timer_2_minutes">2 分钟</string>
+    <string name="default_time_to_add_to_timer_3_minutes">3 分钟</string>
+    <string name="default_time_to_add_to_timer_4_minutes">4 分钟</string>
+    <string name="default_time_to_add_to_timer_5_minutes">5 分钟</string>
+    <string name="default_time_to_add_to_timer_6_minutes">6 分钟</string>
+    <string name="default_time_to_add_to_timer_7_minutes">7 分钟</string>
+    <string name="default_time_to_add_to_timer_9_minutes">9 分钟</string>
+    <string name="default_time_to_add_to_timer_10_minutes">10 分钟</string>
+    <string name="default_time_to_add_to_timer_30_minutes">30 分钟</string>
+    <string name="default_time_to_add_to_timer_1_hour">1 小时</string>
+    <string name="bedtime_reminder_notification_10_minutes">睡前 10 分钟</string>
+    <string name="bedtime_reminder_notification_15_minutes">睡前 15 分钟</string>
+    <string name="bedtime_reminder_notification_20_minutes">睡前 20 分钟</string>
+    <string name="bedtime_reminder_notification_30_minutes">睡前 30 分钟</string>
+    <string name="bedtime_reminder_notification_1_hour">睡前 1 小时</string>
+    <string name="bedtime_reminder_notification_45_minutes">睡前 45 分钟</string>
+    <string name="snooze_duration_none">无</string>
+    <string name="default_time_to_add_to_timer_8_minutes">8 分钟</string>
+    <string name="auto_silence_10_seconds">10 秒</string>
+    <string name="auto_silence_20_seconds">20 秒</string>
+    <string name="auto_silence_30_seconds">30 秒</string>
+    <string name="auto_silence_5_seconds">5 秒</string>
+    <string name="alarm_alert_dismiss_and_delete_text">关闭并删除</string>
+    <string name="description_direction_both_for_occasional_alarm">向左滑动以暂停，向右滑动以关闭并删除闹钟</string>
+    <string name="description_direction_both_clicked_for_occasional_alarm">单击左键以暂停，单击右键以关闭并删除闹钟</string>
+    <string name="description_direction_both_for_occasional_non_repeatable_alarm">向左或向右滑动以关闭并删除闹钟</string>
+    <string name="description_direction_both_for_occasional_non_repeatable_alarm_clicked">单击左键或右键以关闭并删除闹钟</string>
+    <string name="delete_occasional_alarm_after_use_title">关闭后立即删除闹钟</string>
+    <string name="description_direction_right_for_occasional_alarm">向右滑动以关闭并删除闹钟</string>
+    <string name="alarm_alert_off_and_deleted_text">闹钟已关闭并删除</string>
+    <string name="description_direction_left_for_occasional_non_repeatable_alarm">向左滑动以关闭并删除闹钟</string>
+    <string name="occasional_alarm_alert_predismiss_title">预定的临时闹钟</string>
+    <string name="enable_delete_occasional_alarm_by_default_setting_title">默认启用自动删除临时闹钟</string>
+    <string name="enable_delete_occasional_alarm_by_default_setting_summary">可以在扩展闹钟视图中为每个闹钟更改此设置</string>
+    <string name="occasional_alarm_deleted">临时闹钟已删除</string>
+    <string name="backup_restore_settings_title">备份和还原</string>
+    <string name="backup_restore_settings_summary">备份或还原设置，闹钟、定时器和铃声除外</string>
+    <string name="backup_restore_dialog_message">是否要从文件中备份或还原设置？</string>
+    <string name="backup_restore_backup_button_title">备份</string>
+    <string name="backup_restore_restore_button_title">还原</string>
+    <string name="backup_restore_toast_message_for_backup">备份已完成</string>
+    <string name="backup_restore_toast_message_for_restore">还原已完成</string>
+    <string name="timer_flip_action_title">翻转设备以停止闹钟</string>
+    <string name="timer_shake_action_title">摇动设备以停止闹钟</string>
+    <string name="auto_night_accent_color_title">将强调色应用于夜间模式</string>
+    <string name="night_accent_color_title">夜间模式的强调色</string>
+    <string name="sort_timer_manually">手动（通过拖动）</string>
+    <string name="timer_volume_buttons_action_title">使用音量按钮重置已过期的定时器</string>
+    <string name="timer_buttons_action_summary">仅适用于锁屏</string>
+    <string name="timer_power_button_action_title">使用电源按钮重置已过期的定时器</string>
+    <string name="sw_start_pause_action">开始/暂停</string>
+    <string name="sw_volume_up_action_title">音量调高</string>
+    <string name="sw_volume_down_action_title">音量调低</string>
+    <string name="sw_long_press_volume_up_action_title">音量调高（长按后）</string>
+    <string name="sw_long_press_volume_down_action_title">音量调低（长按后）</string>
+    <string name="sw_settings_summary">设置音量按钮的操作</string>
+    <string name="black_accent_color">黑色</string>
+    <string name="purple_accent_color">紫色</string>
+    <string name="yellow_accent_color">黄色</string>
+    <string name="day_accent_color_title">日间模式的强调色</string>
+    <string name="display_ringtone_title">显示铃声标题</string>
+    <string name="warning_dialog_message">是否确定要删除“%s”定时器？</string>
+    <string name="display_warning_before_deleting_timer_title">删除定时器之前显示警告</string>
+    <string name="warning_dialog_title">删除定时器</string>
 </resources>

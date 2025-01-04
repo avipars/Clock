@@ -6,7 +6,7 @@
 
 package com.best.deskclock.alarms.dataadapter;
 
-import static com.best.deskclock.settings.SettingsActivity.KEY_AMOLED_DARK_MODE;
+import static com.best.deskclock.settings.InterfaceCustomizationActivity.KEY_AMOLED_DARK_MODE;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -19,12 +19,12 @@ import android.widget.TextView;
 import com.best.deskclock.ItemAdapter;
 import com.best.deskclock.ItemAnimator;
 import com.best.deskclock.R;
-import com.best.deskclock.Utils;
 import com.best.deskclock.alarms.AlarmTimeClickHandler;
 import com.best.deskclock.bedtime.BedtimeFragment;
 import com.best.deskclock.data.DataModel;
 import com.best.deskclock.data.Weekdays;
 import com.best.deskclock.provider.Alarm;
+import com.best.deskclock.utils.Utils;
 import com.best.deskclock.widget.TextTime;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.color.MaterialColors;
@@ -60,12 +60,12 @@ public abstract class AlarmItemViewHolder extends ItemAdapter.ItemViewHolder<Ala
 
         final MaterialCardView itemCardView = itemView.findViewById(R.id.item_card_view);
         final boolean isCardBackgroundDisplayed = DataModel.getDataModel().isCardBackgroundDisplayed();
-        final String getDarkMode = DataModel.getDataModel().getDarkMode();
+        final String darkMode = DataModel.getDataModel().getDarkMode();
         if (isCardBackgroundDisplayed) {
             itemCardView.setCardBackgroundColor(
                     MaterialColors.getColor(context, com.google.android.material.R.attr.colorSurface, Color.BLACK)
             );
-        } else if (Utils.isNight(context.getResources()) && getDarkMode.equals((KEY_AMOLED_DARK_MODE))) {
+        } else if (Utils.isNight(context.getResources()) && darkMode.equals(KEY_AMOLED_DARK_MODE)) {
             itemCardView.setCardBackgroundColor(Color.BLACK);
         } else {
             itemCardView.setCardBackgroundColor(
@@ -73,22 +73,20 @@ public abstract class AlarmItemViewHolder extends ItemAdapter.ItemViewHolder<Ala
             );
         }
 
-        final boolean isCardBackgroundBorderDisplayed = DataModel.getDataModel().isCardBackgroundBorderDisplayed();
-        if (isCardBackgroundBorderDisplayed) {
+        final boolean isCardBorderDisplayed = DataModel.getDataModel().isCardBorderDisplayed();
+        if (isCardBorderDisplayed) {
             itemCardView.setStrokeWidth(Utils.toPixel(2, context));
             itemCardView.setStrokeColor(
                     MaterialColors.getColor(context, com.google.android.material.R.attr.colorPrimary, Color.BLACK)
             );
         }
 
-        editLabel.setOnClickListener(view -> {
-            if (!getItemHolder().item.equals(Alarm.getAlarmByLabel(itemView.getContext().getContentResolver(), BedtimeFragment.BEDTIME_LABEL))) {
-                getAlarmTimeClickHandler().onEditLabelClicked(getItemHolder().item);
-            }
-        });
+        editLabel.setOnClickListener(view -> getAlarmTimeClickHandler().onEditLabelClicked(getItemHolder().item));
 
         onOff.setOnCheckedChangeListener((compoundButton, checked) ->
                 getItemHolder().getAlarmTimeClickHandler().setAlarmEnabled(getItemHolder().item, checked));
+
+        clock.setOnClickListener(v -> getAlarmTimeClickHandler().onClockClicked(getItemHolder().item));
     }
 
     @Override
@@ -104,15 +102,22 @@ public abstract class AlarmItemViewHolder extends ItemAdapter.ItemViewHolder<Ala
     }
 
     private void bindEditLabel(Context context, Alarm alarm) {
-        if (alarm.label.length() == 0) {
+        if (alarm.equals(Alarm.getAlarmByLabel(context.getContentResolver(), BedtimeFragment.BEDTIME_LABEL))) {
+            editLabel.setOnClickListener(null);
+            editLabel.setBackgroundColor(Color.TRANSPARENT);
+            editLabel.setText(context.getString(R.string.wakeup_alarm_label_visible));
+            editLabel.setTypeface(Typeface.DEFAULT_BOLD);
+            editLabel.setAlpha(alarm.enabled ? CLOCK_ENABLED_ALPHA : CLOCK_DISABLED_ALPHA);
+            return;
+        }
+
+        if (alarm.label.isEmpty()) {
             editLabel.setText(context.getString(R.string.add_label));
             editLabel.setTypeface(Typeface.DEFAULT);
             editLabel.setAlpha(CLOCK_DISABLED_ALPHA);
         } else {
-            editLabel.setText(alarm.equals(Alarm.getAlarmByLabel(context.getContentResolver(), BedtimeFragment.BEDTIME_LABEL))
-                    ? context.getString(R.string.wakeup_alarm_label_visible)
-                    : alarm.label);
-            editLabel.setContentDescription(alarm.label != null && alarm.label.length() > 0
+            editLabel.setText(alarm.label);
+            editLabel.setContentDescription(alarm.label != null && !alarm.label.isEmpty()
                     ? context.getString(R.string.label_description) + " " + alarm.label
                     : context.getString(R.string.no_label_specified));
             editLabel.setTypeface(Typeface.DEFAULT_BOLD);

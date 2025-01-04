@@ -13,7 +13,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="10dp"
-    android:layout_marginVertical="5dp"
+    android:layout_marginVertical="4dp"
     app:strokeWidth="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -32,12 +32,11 @@
             android:ellipsize="end"
             android:gravity="center_vertical"
             android:singleLine="true"
-            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="16sp"
             app:drawableStartCompat="@drawable/ic_label"
-            app:drawableTint="@color/md_theme_onSurfaceVariant"
+            app:drawableTint="?colorOnSurfaceVariant"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:textStyle="bold"
             tools:hint="@string/add_label" />
 
         <ImageButton
@@ -62,12 +61,11 @@
         <LinearLayout
             android:id="@+id/days_of_week_layout"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="24dp"
             android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/onoff"
-            app:layout_constraintTop_toBottomOf="@id/digital_clock"
-            app:layout_constraintBottom_toTopOf="@id/repeat_days_alarm">
+            app:layout_constraintTop_toBottomOf="@id/digital_clock">
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/days_of_week"
@@ -97,9 +95,8 @@
         <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/onoff"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/digital_clock"
             app:layout_constraintBottom_toBottomOf="@+id/days_of_week_layout" />
 
         <!-- Day buttons are put here programmatically -->
@@ -107,9 +104,10 @@
             android:id="@+id/repeat_days_alarm"
             android:layout_width="match_parent"
             android:layout_height="60dp"
+            android:layout_marginTop="10dp"
             android:gravity="center"
             android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@id/onoff" />
+            app:layout_constraintTop_toBottomOf="@id/days_of_week_layout" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/choose_ringtone"
@@ -118,7 +116,6 @@
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:drawableStart="@drawable/ic_ringtone"
-            android:drawableTint="@color/md_theme_onSurfaceVariant"
             android:drawablePadding="10dp"
             android:ellipsize="marquee"
             android:focusable="true"
@@ -126,9 +123,37 @@
             android:marqueeRepeatLimit="marquee_forever"
             android:scrollHorizontally="true"
             android:singleLine="true"
-            android:textColor="?android:attr/textColorPrimary"
+            app:drawableTint="?colorOnSurfaceVariant"
             app:layout_constraintTop_toBottomOf="@id/repeat_days_alarm"
             tools:text="Standard (Hassium)" />
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/dismiss_alarm_when_ringtone_ends_onoff"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="?selectableItemBackground"
+            android:button="@null"
+            android:drawableStart="@drawable/ic_ringtone_off"
+            android:drawableEnd="@drawable/ic_selector_checkbox"
+            android:drawablePadding="10dp"
+            android:text="@string/dismiss_alarm_ringtone_when_ringtone_ends_label"
+            app:layout_constraintTop_toBottomOf="@id/choose_ringtone"
+            tools:ignore="RtlSymmetry"
+            tools:checked="false" />
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/alarm_snooze_actions_onoff"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="?selectableItemBackground"
+            android:button="@null"
+            android:drawableStart="@drawable/ic_repeat"
+            android:drawableEnd="@drawable/ic_selector_checkbox"
+            android:drawablePadding="10dp"
+            android:text="@string/enable_alarm_snooze_actions_label"
+            app:layout_constraintTop_toBottomOf="@id/dismiss_alarm_when_ringtone_ends_onoff"
+            tools:ignore="RtlSymmetry"
+            tools:checked="true" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/vibrate_onoff"
@@ -140,8 +165,21 @@
             android:drawableEnd="@drawable/ic_selector_checkbox"
             android:drawablePadding="10dp"
             android:text="@string/alarm_vibrate"
-            android:textColor="?android:attr/textColorPrimary"
-            app:layout_constraintTop_toBottomOf="@id/choose_ringtone"
+            app:layout_constraintTop_toBottomOf="@id/alarm_snooze_actions_onoff"
+            tools:ignore="RtlSymmetry"
+            tools:checked="true" />
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/delete_occasional_alarm_after_use"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="?selectableItemBackground"
+            android:button="@null"
+            android:drawableStart="@drawable/ic_clear"
+            android:drawableEnd="@drawable/ic_selector_checkbox"
+            android:drawablePadding="10dp"
+            android:text="@string/delete_occasional_alarm_after_use_title"
+            app:layout_constraintTop_toBottomOf="@id/vibrate_onoff"
             tools:ignore="RtlSymmetry"
             tools:checked="true" />
 
@@ -150,11 +188,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/delete"
-            android:textColor="@android:color/white"
+            android:textColor="?colorOnError"
             android:textStyle="bold"
             android:textAllCaps="false"
             app:chipIcon="@drawable/ic_delete"
-            app:chipBackgroundColor="#EF5350"
+            app:chipIconTint="?colorOnError"
+            app:chipBackgroundColor="@color/colorAlert"
             app:chipStrokeWidth="0dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
@@ -171,7 +210,7 @@
             app:chipBackgroundColor="?colorPrimary"
             app:chipStrokeWidth="0dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/vibrate_onoff" />
+            app:layout_constraintTop_toBottomOf="@id/delete_occasional_alarm_after_use" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

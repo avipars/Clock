@@ -12,10 +12,11 @@ import android.net.Uri;
 import android.provider.Settings;
 
 import com.best.deskclock.R;
-import com.best.deskclock.Utils;
-import com.best.deskclock.data.DataModel.AlarmVolumeButtonBehavior;
 import com.best.deskclock.data.DataModel.CitySort;
 import com.best.deskclock.data.DataModel.ClockStyle;
+import com.best.deskclock.data.DataModel.PowerButtonBehavior;
+import com.best.deskclock.data.DataModel.VolumeButtonBehavior;
+import com.best.deskclock.utils.Utils;
 
 import java.util.TimeZone;
 
@@ -84,6 +85,14 @@ final class SettingsModel {
         return SettingsDAO.getAccentColor(mPrefs);
     }
 
+    public boolean isAutoNightAccentColorEnabled() {
+        return SettingsDAO.isAutoNightAccentColorEnabled(mPrefs);
+    }
+
+    String getNightAccentColor() {
+        return SettingsDAO.getNightAccentColor(mPrefs);
+    }
+
     String getDarkMode() {
         return SettingsDAO.getDarkMode(mPrefs);
     }
@@ -92,12 +101,20 @@ final class SettingsModel {
         return SettingsDAO.isCardBackgroundDisplayed(mPrefs);
     }
 
-    public boolean isCardBackgroundBorderDisplayed() {
-        return SettingsDAO.isCardBackgroundBorderDisplayed(mPrefs);
+    public boolean isCardBorderDisplayed() {
+        return SettingsDAO.isCardBorderDisplayed(mPrefs);
     }
 
     public boolean isVibrationsEnabled() {
         return SettingsDAO.isVibrationsEnabled(mPrefs);
+    }
+
+    public boolean isTabIndicatorDisplayed() {
+        return SettingsDAO.isTabIndicatorDisplayed(mPrefs);
+    }
+
+    public boolean isFadeTransitionsEnabled() {
+        return SettingsDAO.isFadeTransitionsEnabled(mPrefs);
     }
 
     boolean getDisplayClockSeconds() {
@@ -112,52 +129,52 @@ final class SettingsModel {
         return SettingsDAO.getScreensaverClockStyle(mContext, mPrefs);
     }
 
-    public boolean getScreensaverClockDynamicColors() {
-        return SettingsDAO.getScreensaverClockDynamicColors(mPrefs);
+    public boolean areScreensaverClockDynamicColors() {
+        return SettingsDAO.areScreensaverClockDynamicColors(mPrefs);
     }
 
-    public String getScreensaverClockPresetColors() {
-        return SettingsDAO.getScreensaverClockPresetColors(mContext, mPrefs);
+    public int getScreensaverClockColorPicker() {
+        return SettingsDAO.getScreensaverClockColorPicker(mPrefs);
     }
 
-    public String getScreensaverDatePresetColors() {
-        return SettingsDAO.getScreensaverDatePresetColors(mContext, mPrefs);
+    public int getScreensaverDateColorPicker() {
+        return SettingsDAO.getScreensaverDateColorPicker(mPrefs);
     }
 
-    public String getScreensaverNextAlarmPresetColors() {
-        return SettingsDAO.getScreensaverNextAlarmPresetColors(mContext, mPrefs);
+    public int getScreensaverNextAlarmColorPicker() {
+        return SettingsDAO.getScreensaverNextAlarmColorPicker(mPrefs);
     }
 
     public int getScreensaverBrightness() {
         return SettingsDAO.getScreensaverBrightness(mPrefs);
     }
 
-    boolean getDisplayScreensaverClockSeconds() {
-        return SettingsDAO.getDisplayScreensaverClockSeconds(mPrefs);
+    boolean areScreensaverClockSecondsDisplayed() {
+        return SettingsDAO.areScreensaverClockSecondsDisplayed(mPrefs);
     }
 
-    boolean getScreensaverBoldDigitalClock() {
-        return SettingsDAO.getScreensaverBoldDigitalClock(mPrefs);
+    boolean isScreensaverDigitalClockInBold() {
+        return SettingsDAO.isScreensaverDigitalClockInBold(mPrefs);
     }
 
-    boolean getScreensaverItalicDigitalClock() {
-        return SettingsDAO.getScreensaverItalicDigitalClock(mPrefs);
+    boolean isScreensaverDigitalClockInItalic() {
+        return SettingsDAO.isScreensaverDigitalClockInItalic(mPrefs);
     }
 
-    boolean getScreensaverBoldDate() {
-        return SettingsDAO.getScreensaverBoldDate(mPrefs);
+    boolean isScreensaverDateInBold() {
+        return SettingsDAO.isScreensaverDateInBold(mPrefs);
     }
 
-    boolean getScreensaverItalicDate() {
-        return SettingsDAO.getScreensaverItalicDate(mPrefs);
+    boolean isScreensaverDateInItalic() {
+        return SettingsDAO.isScreensaverDateInItalic(mPrefs);
     }
 
-    boolean getScreensaverBoldNextAlarm() {
-        return SettingsDAO.getScreensaverBoldNextAlarm(mPrefs);
+    boolean isScreensaverNextAlarmInBold() {
+        return SettingsDAO.isScreensaverNextAlarmInBold(mPrefs);
     }
 
-    boolean getScreensaverItalicNextAlarm() {
-        return SettingsDAO.getScreensaverItalicNextAlarm(mPrefs);
+    boolean isScreensaverNextAlarmInItalic() {
+        return SettingsDAO.isScreensaverNextAlarmInItalic(mPrefs);
     }
 
     boolean getShowHomeClock() {
@@ -189,11 +206,59 @@ final class SettingsModel {
         SettingsDAO.setTimerRingtoneUri(mPrefs, uri);
     }
 
-    AlarmVolumeButtonBehavior getAlarmVolumeButtonBehavior() {
+    long getTimerAutoSilenceDuration() {
+        return SettingsDAO.getTimerAutoSilenceDuration(mPrefs);
+    }
+
+    boolean getTimerVibrate() {
+        return SettingsDAO.getTimerVibrate(mPrefs);
+    }
+
+    void setTimerVibrate(boolean enabled) {
+        SettingsDAO.setTimerVibrate(mPrefs, enabled);
+    }
+
+    boolean isExpiredTimerResetWithVolumeButtons() {
+        return SettingsDAO.isExpiredTimerResetWithVolumeButtons(mPrefs);
+    }
+
+    boolean isExpiredTimerResetWithPowerButton() {
+        return SettingsDAO.isExpiredTimerResetWithPowerButton(mPrefs);
+    }
+
+    boolean isFlipActionForTimersEnabled() {
+        return SettingsDAO.isFlipActionForTimersEnabled(mPrefs);
+    }
+
+    boolean isShakeActionForTimersEnabled() {
+        return SettingsDAO.isShakeActionForTimersEnabled(mPrefs);
+    }
+
+    String getTimerSortingPreference() {
+        return SettingsDAO.getTimerSortingPreference(mPrefs);
+    }
+
+    int getDefaultTimeToAddToTimer() {
+        return SettingsDAO.getDefaultTimeToAddToTimer(mPrefs);
+    }
+
+    boolean shouldTimerDisplayRemainOn() {
+        return SettingsDAO.shouldTimerDisplayRemainOn(mPrefs);
+    }
+
+    boolean isTimerBackgroundTransparent() {
+        return SettingsDAO.isTimerBackgroundTransparent(mPrefs);
+    }
+
+    boolean isWarningDisplayedBeforeDeletingTimer() {
+        return SettingsDAO.isWarningDisplayedBeforeDeletingTimer(mPrefs);
+    }
+
+    VolumeButtonBehavior getAlarmVolumeButtonBehavior() {
         return SettingsDAO.getAlarmVolumeButtonBehavior(mPrefs);
     }
 
-    AlarmVolumeButtonBehavior getAlarmPowerButtonBehavior() {
+    PowerButtonBehavior getAlarmPowerButtonBehavior() {
         return SettingsDAO.getAlarmPowerButtonBehavior(mPrefs);
     }
 
@@ -211,6 +276,78 @@ final class SettingsModel {
 
     int getShakeAction() {
         return SettingsDAO.getShakeAction(mPrefs);
+    }
+
+    int getAlarmNotificationReminderTime() {
+        return SettingsDAO.getAlarmNotificationReminderTime(mPrefs);
+    }
+
+    boolean areAlarmVibrationsEnabledByDefault() {
+        return SettingsDAO.areAlarmVibrationsEnabledByDefault(mPrefs);
+    }
+
+    boolean isOccasionalAlarmDeletedByDefault() {
+        return SettingsDAO.isOccasionalAlarmDeletedByDefault(mPrefs);
+    }
+
+    String getMaterialTimePickerStyle() {
+        return SettingsDAO.getMaterialTimePickerStyle(mPrefs);
+    }
+
+    ClockStyle getAlarmClockStyle() {
+        return SettingsDAO.getAlarmClockStyle(mContext, mPrefs);
+    }
+
+    boolean isAlarmSecondsHandDisplayed() {
+        return SettingsDAO.isAlarmSecondsHandDisplayed(mPrefs);
+    }
+
+    int getAlarmBackgroundColor() {
+        return SettingsDAO.getAlarmBackgroundColor(mPrefs);
+    }
+
+    int getAlarmBackgroundAmoledColor() {
+        return SettingsDAO.getAlarmBackgroundAmoledColor(mPrefs);
+    }
+
+    int getAlarmClockColor() {
+        return SettingsDAO.getAlarmClockColor(mPrefs);
+    }
+
+    int getAlarmSecondsHandColor() {
+        return SettingsDAO.getAlarmSecondsHandColor(mPrefs, mContext);
+    }
+
+    int getAlarmTitleColor() {
+        return SettingsDAO.getAlarmTitleColor(mPrefs);
+    }
+
+    int getSnoozeButtonColor() {
+        return SettingsDAO.getSnoozeButtonColor(mPrefs);
+    }
+
+    int getDismissButtonColor() {
+        return SettingsDAO.getDismissButtonColor(mPrefs);
+    }
+
+    int getAlarmButtonColor() {
+        return SettingsDAO.getAlarmButtonColor(mPrefs);
+    }
+
+    int getPulseColor() {
+        return SettingsDAO.getPulseColor(mPrefs);
+    }
+
+    public String getAlarmClockFontSize() {
+        return SettingsDAO.getAlarmClockFontSize(mPrefs);
+    }
+
+    public String getAlarmTitleFontSize() {
+        return SettingsDAO.getAlarmTitleFontSize(mPrefs);
+    }
+
+    public boolean isRingtoneTitleDisplayed() {
+        return SettingsDAO.isRingtoneTitleDisplayed(mPrefs);
     }
 
     Uri getDefaultAlarmRingtoneUriFromSettings() {
@@ -240,6 +377,10 @@ final class SettingsModel {
         return SettingsDAO.getTimerCrescendoDuration(mPrefs);
     }
 
+    boolean isSwipeActionEnabled() {
+        return SettingsDAO.isSwipeActionEnabled(mPrefs);
+    }
+
     Weekdays.Order getWeekdayOrder() {
         return SettingsDAO.getWeekdayOrder(mPrefs);
     }
@@ -252,15 +393,24 @@ final class SettingsModel {
         SettingsDAO.setRestoreBackupFinished(mPrefs, finished);
     }
 
-    boolean getTimerVibrate() {
-        return SettingsDAO.getTimerVibrate(mPrefs);
+    String getVolumeUpActionForStopwatch() {
+        return SettingsDAO.getVolumeUpActionForStopwatch(mPrefs);
     }
 
-    void setTimerVibrate(boolean enabled) {
-        SettingsDAO.setTimerVibrate(mPrefs, enabled);
+    String getVolumeUpActionAfterLongPressForStopwatch() {
+        return SettingsDAO.getVolumeUpActionAfterLongPressForStopwatch(mPrefs);
+    }
+
+    String getVolumeDownActionForStopwatch() {
+        return SettingsDAO.getVolumeDownActionForStopwatch(mPrefs);
+    }
+
+    String getVolumeDownActionAfterLongPressForStopwatch() {
+        return SettingsDAO.getVolumeDownActionAfterLongPressForStopwatch(mPrefs);
     }
 
     TimeZones getTimeZones() {
         return SettingsDAO.getTimeZones(mContext, mTimeModel.currentTimeMillis());
     }
+
 }

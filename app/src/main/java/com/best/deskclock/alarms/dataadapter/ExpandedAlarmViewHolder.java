@@ -7,11 +7,15 @@
 package com.best.deskclock.alarms.dataadapter;
 
 import static android.content.Context.VIBRATOR_SERVICE;
+import static android.view.View.GONE;
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Vibrator;
 import android.view.LayoutInflater;
@@ -25,17 +29,19 @@ import android.widget.TextView;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
-import com.best.deskclock.AnimatorUtils;
 import com.best.deskclock.ItemAdapter;
 import com.best.deskclock.R;
-import com.best.deskclock.Utils;
 import com.best.deskclock.alarms.AlarmTimeClickHandler;
 import com.best.deskclock.bedtime.BedtimeFragment;
 import com.best.deskclock.data.DataModel;
 import com.best.deskclock.events.Events;
 import com.best.deskclock.provider.Alarm;
 import com.best.deskclock.uidata.UiDataModel;
+import com.best.deskclock.utils.AnimatorUtils;
+import com.best.deskclock.utils.Utils;
+
 import com.google.android.material.chip.Chip;
+import com.google.android.material.color.MaterialColors;
 
 import java.util.List;
 
@@ -46,7 +52,10 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
     public static final int VIEW_TYPE = R.layout.alarm_time_expanded;
 
     public final LinearLayout repeatDays;
+    public final CheckBox dismissAlarmWhenRingtoneEnds;
+    public final CheckBox alarmSnoozeActions;
     public final CheckBox vibrate;
+    public final CheckBox deleteOccasionalAlarmAfterUse;
     public final TextView ringtone;
     public final Chip delete;
     public final Chip duplicate;
@@ -59,14 +68,16 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
 
         mHasVibrator = hasVibrator;
 
+        repeatDays = itemView.findViewById(R.id.repeat_days_alarm);
+        ringtone = itemView.findViewById(R.id.choose_ringtone);
         delete = itemView.findViewById(R.id.delete);
         duplicate = itemView.findViewById(R.id.duplicate);
+        dismissAlarmWhenRingtoneEnds = itemView.findViewById(R.id.dismiss_alarm_when_ringtone_ends_onoff);
+        alarmSnoozeActions = itemView.findViewById(R.id.alarm_snooze_actions_onoff);
         vibrate = itemView.findViewById(R.id.vibrate_onoff);
-        ringtone = itemView.findViewById(R.id.choose_ringtone);
-        repeatDays = itemView.findViewById(R.id.repeat_days_alarm);
+        deleteOccasionalAlarmAfterUse = itemView.findViewById(R.id.delete_occasional_alarm_after_use);
 
         final Context context = itemView.getContext();
-
 
         // Build button for each day.
         final LayoutInflater inflater = LayoutInflater.from(context);
@@ -92,12 +103,24 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
             getItemHolder().collapse();
         });
 
-        // Edit time handler
-        clock.setOnClickListener(v -> getAlarmTimeClickHandler().onClockClicked(getItemHolder().item));
+        // Dismiss alarm when ringtone ends checkbox handler
+        dismissAlarmWhenRingtoneEnds.setOnClickListener(v ->
+                getAlarmTimeClickHandler().setDismissAlarmWhenRingtoneEndsEnabled(
+                        getItemHolder().item, ((CheckBox) v).isChecked())
+        );
+
+        // Alarm snooze actions checkbox handler
+        alarmSnoozeActions.setOnClickListener(v ->
+                getAlarmTimeClickHandler().setAlarmSnoozeActionsEnabled(
+                        getItemHolder().item, ((CheckBox) v).isChecked())
+        );
 
         // Vibrator checkbox handler
         vibrate.setOnClickListener(v ->
                 getAlarmTimeClickHandler().setAlarmVibrationEnabled(getItemHolder().item, ((CheckBox) v).isChecked()));
+
+        deleteOccasionalAlarmAfterUse.setOnClickListener(v ->
+                getAlarmTimeClickHandler().deleteOccasionalAlarmAfterUse(getItemHolder().item, ((CheckBox) v).isChecked()));
 
         // Ringtone editor handler
         ringtone.setOnClickListener(view -> getAlarmTimeClickHandler().onRingtoneClicked(context, getItemHolder().item));
@@ -133,9 +156,28 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         final Alarm alarm = itemHolder.item;
         final Context context = itemView.getContext();
         bindDaysOfWeekButtons(alarm, context);
-        bindVibrator(alarm);
         bindRingtone(context, alarm);
+        bindDismissAlarmWhenRingtoneEnds(alarm);
+        bindAlarmSnoozeActions(alarm);
+        bindVibrator(alarm);
+        bindDeleteOccasionalAlarmAfterUse(alarm);
         bindDuplicateButton();
+    }
+
+    private void bindDaysOfWeekButtons(Alarm alarm, Context context) {
+        final List<Integer> weekdays = DataModel.getDataModel().getWeekdayOrder().getCalendarDays();
+        for (int i = 0; i < weekdays.size(); i++) {
+            final CompoundButton dayButton = dayButtons[i];
+            if (alarm.daysOfWeek.isBitOn(weekdays.get(i))) {
+                dayButton.setChecked(true);
+                dayButton.setTextColor(MaterialColors.getColor(
+                        context, com.google.android.material.R.attr.colorOnSurfaceInverse, Color.BLACK));
+            } else {
+                dayButton.setChecked(false);
+                dayButton.setTextColor(MaterialColors.getColor(
+                        context, com.google.android.material.R.attr.colorSurfaceInverse, Color.BLACK));
+            }
+        }
     }
 
     private void bindRingtone(Context context, Alarm alarm) {
@@ -152,35 +194,50 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         ringtone.setCompoundDrawablesRelativeWithIntrinsicBounds(iconRingtone, null, null, null);
     }
 
-    private void bindDaysOfWeekButtons(Alarm alarm, Context context) {
-        final List<Integer> weekdays = DataModel.getDataModel().getWeekdayOrder().getCalendarDays();
-        for (int i = 0; i < weekdays.size(); i++) {
-            final CompoundButton dayButton = dayButtons[i];
-            if (alarm.daysOfWeek.isBitOn(weekdays.get(i))) {
-                dayButton.setChecked(true);
-                dayButton.setTextColor(context.getColor(R.color.md_theme_inverseOnSurface));
-            } else {
-                dayButton.setChecked(false);
-                dayButton.setTextColor(context.getColor(R.color.md_theme_inverseSurface));
-            }
+    private void bindDismissAlarmWhenRingtoneEnds(Alarm alarm) {
+        final int timeoutMinutes = DataModel.getDataModel().getAlarmTimeout();
+        if (timeoutMinutes == -2) {
+            dismissAlarmWhenRingtoneEnds.setVisibility(GONE);
+        } else {
+            dismissAlarmWhenRingtoneEnds.setVisibility(VISIBLE);
+            dismissAlarmWhenRingtoneEnds.setChecked(alarm.dismissAlarmWhenRingtoneEnds);
+        }
+    }
+
+    private void bindAlarmSnoozeActions(Alarm alarm) {
+        final int snoozeMinutes = DataModel.getDataModel().getSnoozeLength();
+        if (snoozeMinutes == -1) {
+            alarmSnoozeActions.setVisibility(GONE);
+        } else {
+            alarmSnoozeActions.setVisibility(VISIBLE);
+            alarmSnoozeActions.setChecked(alarm.alarmSnoozeActions);
         }
     }
 
     private void bindVibrator(Alarm alarm) {
         if (mHasVibrator) {
-            vibrate.setVisibility(View.VISIBLE);
+            vibrate.setVisibility(VISIBLE);
             vibrate.setChecked(alarm.vibrate);
         } else {
-            vibrate.setVisibility(View.GONE);
+            vibrate.setVisibility(GONE);
+        }
+    }
+
+    private void bindDeleteOccasionalAlarmAfterUse(Alarm alarm) {
+        if (alarm.daysOfWeek.isRepeating()) {
+            deleteOccasionalAlarmAfterUse.setVisibility(GONE);
+        } else {
+            deleteOccasionalAlarmAfterUse.setVisibility(VISIBLE);
+            deleteOccasionalAlarmAfterUse.setChecked(alarm.deleteAfterUse);
         }
     }
 
     private void bindDuplicateButton() {
         if (getItemHolder().item.equals(
                 Alarm.getAlarmByLabel(itemView.getContext().getContentResolver(), BedtimeFragment.BEDTIME_LABEL))) {
-            duplicate.setVisibility(View.INVISIBLE);
+            duplicate.setVisibility(INVISIBLE);
         } else {
-            duplicate.setVisibility(View.VISIBLE);
+            duplicate.setVisibility(VISIBLE);
         }
     }
 

@@ -28,9 +28,10 @@ import android.util.ArrayMap;
 
 import androidx.annotation.NonNull;
 
-import com.best.deskclock.LogUtils;
+import com.best.deskclock.utils.LogUtils;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class ClockProvider extends ContentProvider {
 
@@ -69,6 +70,10 @@ public class ClockProvider extends ContentProvider {
                 ALARMS_TABLE_NAME + "." + AlarmsColumns.DAYS_OF_WEEK);
         sAlarmsWithInstancesProjection.put(ALARMS_TABLE_NAME + "." + AlarmsColumns.ENABLED,
                 ALARMS_TABLE_NAME + "." + AlarmsColumns.ENABLED);
+        sAlarmsWithInstancesProjection.put(ALARMS_TABLE_NAME + "." + AlarmsColumns.DISMISS_ALARM_WHEN_RINGTONE_ENDS,
+                ALARMS_TABLE_NAME + "." + AlarmsColumns.DISMISS_ALARM_WHEN_RINGTONE_ENDS);
+        sAlarmsWithInstancesProjection.put(ALARMS_TABLE_NAME + "." + AlarmsColumns.ALARM_SNOOZE_ACTIONS,
+                ALARMS_TABLE_NAME + "." + AlarmsColumns.ALARM_SNOOZE_ACTIONS);
         sAlarmsWithInstancesProjection.put(ALARMS_TABLE_NAME + "." + AlarmsColumns.VIBRATE,
                 ALARMS_TABLE_NAME + "." + AlarmsColumns.VIBRATE);
         sAlarmsWithInstancesProjection.put(ALARMS_TABLE_NAME + "." + AlarmsColumns.LABEL,
@@ -96,6 +101,10 @@ public class ClockProvider extends ContentProvider {
                 INSTANCES_TABLE_NAME + "." + InstancesColumns.MINUTES);
         sAlarmsWithInstancesProjection.put(INSTANCES_TABLE_NAME + "." + InstancesColumns.LABEL,
                 INSTANCES_TABLE_NAME + "." + InstancesColumns.LABEL);
+        sAlarmsWithInstancesProjection.put(INSTANCES_TABLE_NAME + "." + InstancesColumns.DISMISS_ALARM_WHEN_RINGTONE_ENDS,
+                INSTANCES_TABLE_NAME + "." + InstancesColumns.DISMISS_ALARM_WHEN_RINGTONE_ENDS);
+        sAlarmsWithInstancesProjection.put(INSTANCES_TABLE_NAME + "." + InstancesColumns.ALARM_SNOOZE_ACTIONS,
+                INSTANCES_TABLE_NAME + "." + InstancesColumns.ALARM_SNOOZE_ACTIONS);
         sAlarmsWithInstancesProjection.put(INSTANCES_TABLE_NAME + "." + InstancesColumns.VIBRATE,
                 INSTANCES_TABLE_NAME + "." + InstancesColumns.VIBRATE);
     }
@@ -122,6 +131,7 @@ public class ClockProvider extends ContentProvider {
             // All N devices have split storage areas, but we may need to
             // migrate existing database into the new device encrypted
             // storage area, which is where our data lives from now on.
+            assert context != null;
             storageContext = context.createDeviceProtectedStorageContext();
             if (!storageContext.moveDatabaseFrom(context, ClockDatabaseHelper.DATABASE_NAME)) {
                 LogUtils.wtf("Failed to migrate database: %s", ClockDatabaseHelper.DATABASE_NAME);
@@ -147,13 +157,13 @@ public class ClockProvider extends ContentProvider {
             case ALARMS_ID -> {
                 qb.setTables(ALARMS_TABLE_NAME);
                 qb.appendWhere(AlarmsColumns._ID + "=");
-                qb.appendWhere(uri.getLastPathSegment());
+                qb.appendWhere(Objects.requireNonNull(uri.getLastPathSegment()));
             }
             case INSTANCES -> qb.setTables(INSTANCES_TABLE_NAME);
             case INSTANCES_ID -> {
                 qb.setTables(INSTANCES_TABLE_NAME);
                 qb.appendWhere(InstancesColumns._ID + "=");
-                qb.appendWhere(uri.getLastPathSegment());
+                qb.appendWhere(Objects.requireNonNull(uri.getLastPathSegment()));
             }
             case ALARMS_WITH_INSTANCES -> {
                 qb.setTables(ALARM_JOIN_INSTANCE_TABLE_STATEMENT);
@@ -168,7 +178,7 @@ public class ClockProvider extends ContentProvider {
         if (ret == null) {
             LogUtils.e("Alarms.query: failed");
         } else {
-            ret.setNotificationUri(getContext().getContentResolver(), uri);
+            ret.setNotificationUri(Objects.requireNonNull(getContext()).getContentResolver(), uri);
         }
 
         return ret;
@@ -208,7 +218,7 @@ public class ClockProvider extends ContentProvider {
         }
 
         LogUtils.v("*** notifyChange() id: " + alarmId + " url " + uri);
-        notifyChange(getContext().getContentResolver(), uri);
+        notifyChange(Objects.requireNonNull(getContext()).getContentResolver(), uri);
         return count;
     }
 
@@ -223,7 +233,7 @@ public class ClockProvider extends ContentProvider {
         };
 
         Uri uriResult = ContentUris.withAppendedId(uri, rowId);
-        notifyChange(getContext().getContentResolver(), uriResult);
+        notifyChange(Objects.requireNonNull(getContext()).getContentResolver(), uriResult);
         return uriResult;
     }
 
@@ -256,7 +266,7 @@ public class ClockProvider extends ContentProvider {
             default -> throw new IllegalArgumentException("Cannot delete from URI: " + uri);
         }
 
-        notifyChange(getContext().getContentResolver(), uri);
+        notifyChange(Objects.requireNonNull(getContext()).getContentResolver(), uri);
         return count;
     }
 

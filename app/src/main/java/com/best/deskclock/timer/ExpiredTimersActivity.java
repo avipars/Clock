@@ -6,7 +6,14 @@
 
 package com.best.deskclock.timer;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.text.TextUtils;
@@ -23,12 +30,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.best.deskclock.LogUtils;
 import com.best.deskclock.R;
-import com.best.deskclock.Utils;
 import com.best.deskclock.data.DataModel;
 import com.best.deskclock.data.Timer;
 import com.best.deskclock.data.TimerListener;
+import com.best.deskclock.utils.LogUtils;
+import com.best.deskclock.utils.Utils;
 
 import java.util.List;
 
@@ -59,20 +66,56 @@ public class ExpiredTimersActivity extends AppCompatActivity {
      */
     private ViewGroup mExpiredTimersView;
 
+    private final BroadcastReceiver PowerBtnReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null && intent.getAction() != null) {
+                if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)
+                        || intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+                    final boolean isExpiredTimerResetWithPowerButton =
+                            DataModel.getDataModel().isExpiredTimerResetWithPowerButton();
+                    if (isExpiredTimerResetWithPowerButton) {
+                        DataModel.getDataModel().resetOrDeleteExpiredTimers(R.string.label_hardware_button);
+                    }
+                }
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Utils.applyThemeAndAccentColor(this);
+
+        // Register Power button (screen off) intent receiver
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(PowerBtnReceiver, filter, Context.RECEIVER_EXPORTED);
+        } else {
+            registerReceiver(PowerBtnReceiver, filter);
+        }
+
         final List<Timer> expiredTimers = getExpiredTimers();
 
         // If no expired timers, finish
-        if (expiredTimers.size() == 0) {
+        if (expiredTimers.isEmpty()) {
             LogUtils.i("No expired timers, skipping display.");
             finish();
             return;
         }
 
+        hideNavigationBar();
+
+        boolean isTimerBackgroundTransparent = DataModel.getDataModel().isTimerBackgroundTransparent();
+
         setContentView(R.layout.expired_timers_activity);
+
+        if (isTimerBackgroundTransparent) {
+            getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            getWindow().setNavigationBarColor(Color.TRANSPARENT);
+        }
 
         mExpiredTimersView = findViewById(R.id.expired_timers_list);
         mExpiredTimersScrollView = findViewById(R.id.expired_timers_scroll);
@@ -119,16 +162,27 @@ public class ExpiredTimersActivity extends AppCompatActivity {
 
     @Override
     public boolean dispatchKeyEvent(@NonNull KeyEvent event) {
-        if (event.getAction() == KeyEvent.ACTION_UP) {
-            switch (event.getKeyCode()) {
-                case KeyEvent.KEYCODE_VOLUME_UP, KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_MUTE,
-                        KeyEvent.KEYCODE_CAMERA, KeyEvent.KEYCODE_FOCUS -> {
-                    DataModel.getDataModel().resetOrDeleteExpiredTimers(R.string.label_hardware_button);
-                    return true;
+        switch (event.getKeyCode()) {
+            case KeyEvent.KEYCODE_VOLUME_UP, KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_MUTE,
+                    KeyEvent.KEYCODE_CAMERA, KeyEvent.KEYCODE_FOCUS, KeyEvent.KEYCODE_HEADSETHOOK -> {
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    final boolean isExpiredTimerResetWithVolumeButtons =
+                            DataModel.getDataModel().isExpiredTimerResetWithVolumeButtons();
+                    if (isExpiredTimerResetWithVolumeButtons) {
+                        DataModel.getDataModel().resetOrDeleteExpiredTimers(R.string.label_hardware_button);
+                    }
                 }
+                return true;
             }
         }
+
         return super.dispatchKeyEvent(event);
+    }
+
+    private void hideNavigationBar() {
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
     }
 
     /**
@@ -166,16 +220,16 @@ public class ExpiredTimersActivity extends AppCompatActivity {
         labelView.setHint(null);
         labelView.setVisibility(TextUtils.isEmpty(timer.getLabel()) ? View.GONE : View.VISIBLE);
 
-        // Add logic to the "Add 1 Minute" button.
-        final View addMinuteButton = timerItem.findViewById(R.id.add_one_min);
-        addMinuteButton.setOnClickListener(v -> {
+        // Add logic to the "Add Minute Or Hour" button.
+        final View addTimeButton = timerItem.findViewById(R.id.timer_add_time_button);
+        addTimeButton.setOnClickListener(v -> {
             final Timer timer12 = DataModel.getDataModel().getTimer(timerId);
-            DataModel.getDataModel().addTimerMinute(timer12);
+            DataModel.getDataModel().addCustomTimeToTimer(timer12);
         });
 
-        // Add logic to hide the 'X' and reset button
-        final View closeButton = timerItem.findViewById(R.id.close);
-        closeButton.setVisibility(View.GONE);
+        // Add logic to hide the 'X' and reset buttons
+        final View deleteButton = timerItem.findViewById(R.id.delete_timer);
+        deleteButton.setVisibility(View.GONE);
         final View resetButton = timerItem.findViewById(R.id.reset);
         resetButton.setVisibility(View.GONE);
 
@@ -275,7 +329,7 @@ public class ExpiredTimersActivity extends AppCompatActivity {
      */
     private class TimerChangeWatcher implements TimerListener {
         @Override
-        public void timerAdded(Timer timer) {
+        public void timerAdded(Context context, Timer timer) {
             if (timer.isExpired()) {
                 addTimer(timer);
             }

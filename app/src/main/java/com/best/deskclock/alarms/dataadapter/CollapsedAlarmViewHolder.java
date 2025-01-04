@@ -15,10 +15,10 @@ import android.view.ViewGroup;
 
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
-import com.best.deskclock.AnimatorUtils;
 import com.best.deskclock.ItemAdapter;
 import com.best.deskclock.R;
 import com.best.deskclock.events.Events;
+import com.best.deskclock.utils.AnimatorUtils;
 
 import java.util.List;
 
@@ -28,8 +28,6 @@ import java.util.List;
 public final class CollapsedAlarmViewHolder extends AlarmItemViewHolder {
 
     public static final int VIEW_TYPE = R.layout.alarm_time_collapsed;
-
-
 
     private CollapsedAlarmViewHolder(View itemView) {
         super(itemView);
@@ -42,13 +40,6 @@ public final class CollapsedAlarmViewHolder extends AlarmItemViewHolder {
 
         arrow.setOnClickListener(v -> {
             Events.sendAlarmEvent(R.string.action_expand, R.string.label_deskclock);
-            getItemHolder().expand();
-        });
-
-        // Edit time handler
-        clock.setOnClickListener(v -> {
-            getItemHolder().getAlarmTimeClickHandler().onClockClicked(getItemHolder().item);
-            Events.sendAlarmEvent(R.string.action_expand_implied, R.string.label_deskclock);
             getItemHolder().expand();
         });
 

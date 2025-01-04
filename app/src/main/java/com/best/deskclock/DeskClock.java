@@ -10,8 +10,9 @@ import static android.text.format.DateUtils.SECOND_IN_MILLIS;
 import static androidx.viewpager.widget.ViewPager.SCROLL_STATE_DRAGGING;
 import static androidx.viewpager.widget.ViewPager.SCROLL_STATE_IDLE;
 import static androidx.viewpager.widget.ViewPager.SCROLL_STATE_SETTLING;
-import static com.best.deskclock.AnimatorUtils.getScaleAnimator;
-import static com.best.deskclock.settings.SettingsActivity.KEY_AMOLED_DARK_MODE;
+import static com.best.deskclock.data.WidgetModel.ACTION_NEXT_ALARM_LABEL_CHANGED;
+import static com.best.deskclock.settings.InterfaceCustomizationActivity.KEY_AMOLED_DARK_MODE;
+import static com.best.deskclock.utils.AnimatorUtils.getScaleAnimator;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -22,6 +23,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -29,9 +32,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
@@ -42,11 +48,13 @@ import com.best.deskclock.data.DataModel.SilentSetting;
 import com.best.deskclock.data.OnSilentSettingsListener;
 import com.best.deskclock.events.Events;
 import com.best.deskclock.provider.Alarm;
+import com.best.deskclock.settings.PermissionsManagementActivity;
 import com.best.deskclock.settings.SettingsActivity;
 import com.best.deskclock.stopwatch.StopwatchService;
 import com.best.deskclock.timer.TimerService;
 import com.best.deskclock.uidata.TabListener;
 import com.best.deskclock.uidata.UiDataModel;
+import com.best.deskclock.utils.Utils;
 import com.best.deskclock.widget.toast.SnackbarManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.color.MaterialColors;
@@ -61,6 +69,7 @@ public class DeskClock extends AppCompatActivity
         implements FabContainer, LabelDialogFragment.AlarmLabelDialogHandler {
 
     public static final int REQUEST_CHANGE_SETTINGS = 10;
+    public static final int REQUEST_CHANGE_PERMISSIONS = 20;
 
     /**
      * Shrinks the {@link #mFab}, {@link #mLeftButton} and {@link #mRightButton} to nothing.
@@ -170,6 +179,28 @@ public class DeskClock extends AppCompatActivity
      */
     private boolean mRecreateActivity;
 
+    /**
+     * Callback for getting the result from the Settings activity.
+     */
+    private final ActivityResultLauncher<Intent> getSettingsActivity = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), (result) -> {
+                if (result.getResultCode() != REQUEST_CHANGE_SETTINGS) {
+                    return;
+                }
+                mRecreateActivity = true;
+            });
+
+    /**
+     * Callback for getting the result from the Permission Management activity.
+     */
+    private final ActivityResultLauncher<Intent> getPermissionManagementActivity = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), (result) -> {
+                if (result.getResultCode() != REQUEST_CHANGE_PERMISSIONS) {
+                    return;
+                }
+                mRecreateActivity = true;
+            });
+
     @Override
     public void onNewIntent(Intent newIntent) {
         super.onNewIntent(newIntent);
@@ -182,14 +213,13 @@ public class DeskClock extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        isFirstLaunch();
+
         Utils.applyThemeAndAccentColor(this);
 
         setContentView(R.layout.desk_clock);
 
         mSnackbarAnchor = findViewById(R.id.content);
-
-        // Seems necessary if the application is launched from a widget
-        isFirstLaunch();
 
         showTabFromNotifications();
 
@@ -279,18 +309,29 @@ public class DeskClock extends AppCompatActivity
         mFragmentTabPager.setAdapter(mFragmentTabPagerAdapter);
 
         // Mirror changes made to the selected tab into UiDataModel.
-        final String getDarkMode = DataModel.getDataModel().getDarkMode();
-        final int primaryColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorPrimary, Color.BLACK);
-        final int surfaceColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, Color.BLACK);
+        final String darkMode = DataModel.getDataModel().getDarkMode();
+        final int primaryColor = MaterialColors.getColor(
+                this, com.google.android.material.R.attr.colorPrimary, Color.BLACK);
+        final int surfaceColor = MaterialColors.getColor(
+                this, com.google.android.material.R.attr.colorSurface, Color.BLACK);
+        final int onBackgroundColor = MaterialColors.getColor(
+                this, com.google.android.material.R.attr.colorOnBackground, Color.BLACK);
+        final boolean isTabIndicatorDisplayed = DataModel.getDataModel().isTabIndicatorDisplayed();
 
         mBottomNavigation = findViewById(R.id.bottom_view);
         mBottomNavigation.setOnItemSelectedListener(mNavigationListener);
-        mBottomNavigation.setItemActiveIndicatorEnabled(false);
+        mBottomNavigation.setItemActiveIndicatorEnabled(isTabIndicatorDisplayed);
+
+        if (!isTabIndicatorDisplayed) {
+            final int bottomNavigationMenuPadding = Utils.toPixel(4, context);
+            mBottomNavigation.setPadding(0, bottomNavigationMenuPadding, 0, bottomNavigationMenuPadding);
+        }
+
         mBottomNavigation.setItemIconTintList(new ColorStateList(
                 new int[][]{{android.R.attr.state_selected}, {android.R.attr.state_pressed}, {}},
-                new int[]{primaryColor, primaryColor, getColor(R.color.md_theme_onBackground)})
+                new int[]{primaryColor, primaryColor, onBackgroundColor})
         );
-        if (Utils.isNight(getResources()) && getDarkMode.equals(KEY_AMOLED_DARK_MODE)) {
+        if (Utils.isNight(getResources()) && darkMode.equals(KEY_AMOLED_DARK_MODE)) {
             mBottomNavigation.setBackgroundColor(Color.BLACK);
             mBottomNavigation.setItemTextColor(new ColorStateList(
                     new int[][]{{android.R.attr.state_selected}, {android.R.attr.state_pressed}, {}},
@@ -300,6 +341,9 @@ public class DeskClock extends AppCompatActivity
             final boolean isCardBackgroundDisplayed = DataModel.getDataModel().isCardBackgroundDisplayed();
             if (isCardBackgroundDisplayed) {
                 mBottomNavigation.setBackgroundColor(surfaceColor);
+                this.getWindow().setNavigationBarColor(
+                        MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, Color.BLACK)
+                );
             } else {
                 mBottomNavigation.setBackgroundColor(Color.TRANSPARENT);
                 this.getWindow().setNavigationBarColor(
@@ -308,7 +352,7 @@ public class DeskClock extends AppCompatActivity
             }
             mBottomNavigation.setItemTextColor(new ColorStateList(
                     new int[][]{{android.R.attr.state_selected}, {android.R.attr.state_pressed}, {}},
-                    new int[]{primaryColor, primaryColor, getColor(R.color.md_theme_onBackground)})
+                    new int[]{primaryColor, primaryColor, onBackgroundColor})
             );
         }
 
@@ -365,8 +409,16 @@ public class DeskClock extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, Menu.NONE, 0, R.string.settings)
+        menu.add(0, Menu.NONE, 1, R.string.settings)
                 .setIcon(R.drawable.ic_settings).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+        if (PermissionsManagementActivity.areEssentialPermissionsNotGranted(this)) {
+            final Drawable warningIcon = AppCompatResources.getDrawable(this, R.drawable.ic_error);
+            assert warningIcon != null;
+            warningIcon.setColorFilter(this.getColor(R.color.colorAlert), PorterDuff.Mode.SRC_IN);
+            menu.add(0, Menu.FIRST, 0, R.string.denied_permission_label)
+                    .setIcon(warningIcon).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        }
         return true;
     }
 
@@ -374,7 +426,13 @@ public class DeskClock extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == 0) {
             final Intent settingIntent = new Intent(getApplicationContext(), SettingsActivity.class);
-            startActivityForResult(settingIntent, REQUEST_CHANGE_SETTINGS);
+            getSettingsActivity.launch(settingIntent);
+            return true;
+        }
+
+        if (item.getItemId() == 1) {
+            final Intent permissionManagementIntent = new Intent(getApplicationContext(), PermissionsManagementActivity.class);
+            getPermissionManagementActivity.launch(permissionManagementIntent);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -388,6 +446,8 @@ public class DeskClock extends AppCompatActivity
         final Fragment frag = getSupportFragmentManager().findFragmentByTag(tag);
         if (frag instanceof AlarmClockFragment) {
             ((AlarmClockFragment) frag).setLabel(alarm, label);
+            // Update the alarm title in the “Next alarm” widget
+            sendBroadcast(new Intent(ACTION_NEXT_ALARM_LABEL_CHANGED));
         }
     }
 
@@ -398,6 +458,11 @@ public class DeskClock extends AppCompatActivity
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         return getSelectedDeskClockFragment().onKeyDown(keyCode, event) || super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        return getSelectedDeskClockFragment().onKeyUp(keyCode, event) || super.onKeyUp(keyCode, event);
     }
 
     @Override
@@ -423,15 +488,6 @@ public class DeskClock extends AppCompatActivity
         switch (updateType & FAB_AND_BUTTONS_SHRINK_EXPAND_MASK) {
             case FAB_AND_BUTTONS_SHRINK -> mHideAnimation.start();
             case FAB_AND_BUTTONS_EXPAND -> mShowAnimation.start();
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Recreate the activity if any settings have been changed
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CHANGE_SETTINGS && resultCode == RESULT_OK) {
-            mRecreateActivity = true;
         }
     }
 
@@ -657,7 +713,6 @@ public class DeskClock extends AppCompatActivity
             SnackbarManager.show(snackbar);
         }
     }
-
 
     /**
      * As the model reports changes to the selected tab, update the user interface.

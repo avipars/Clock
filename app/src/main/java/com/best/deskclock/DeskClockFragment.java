@@ -46,6 +46,11 @@ public abstract class DeskClockFragment extends Fragment implements FabContainer
         return false;
     }
 
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        // By default return false so event continues to propagate
+        return false;
+    }
+
     /**
      * Called before onUpdateFab when the fab should be animated.
      * @param fab the fab component to be configured based on current state
@@ -73,7 +78,7 @@ public abstract class DeskClockFragment extends Fragment implements FabContainer
     }
 
     /**
-     * @return {@code true} iff the currently selected tab displays this fragment
+     * @return {@code true} if the currently selected tab displays this fragment
      */
     public final boolean isTabSelected() {
         return UiDataModel.getUiDataModel().getSelectedTab() == mTab;

@@ -13,7 +13,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="10dp"
-    android:layout_marginVertical="5dp"
+    android:layout_marginVertical="4dp"
     app:strokeWidth="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -32,13 +32,12 @@
             android:ellipsize="end"
             android:gravity="center_vertical"
             android:singleLine="true"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textStyle="bold"
+            android:textSize="16sp"
             app:drawableStartCompat="@drawable/ic_label"
-            app:drawableTint="@color/md_theme_onSurfaceVariant"
+            app:drawableTint="?colorOnSurfaceVariant"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="@string/add_label" />
+            tools:hint="@string/add_label" />
 
         <include
             layout="@layout/alarm_time_summary"
@@ -62,11 +61,10 @@
         <LinearLayout
             android:id="@+id/days_of_week_layout"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="24dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/onoff"
-            app:layout_constraintTop_toBottomOf="@id/digital_clock"
-            app:layout_constraintBottom_toTopOf="@id/repeat_days_alarm">
+            app:layout_constraintTop_toBottomOf="@id/digital_clock">
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/days_of_week"
@@ -96,9 +94,9 @@
         <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/onoff"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/digital_clock" />
+            app:layout_constraintBottom_toBottomOf="@+id/days_of_week_layout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

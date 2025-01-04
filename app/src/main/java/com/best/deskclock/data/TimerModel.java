@@ -26,6 +26,8 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
+import android.os.PowerManager;
 import android.util.ArraySet;
 
 import androidx.annotation.StringRes;
@@ -33,12 +35,13 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.best.deskclock.AlarmAlertWakeLock;
-import com.best.deskclock.LogUtils;
 import com.best.deskclock.R;
 import com.best.deskclock.events.Events;
-import com.best.deskclock.settings.SettingsActivity;
+import com.best.deskclock.settings.TimerSettingsActivity;
 import com.best.deskclock.timer.TimerKlaxon;
 import com.best.deskclock.timer.TimerService;
+import com.best.deskclock.utils.LogUtils;
+import com.best.deskclock.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -194,21 +197,21 @@ final class TimerModel {
      * @return all defined timers in their creation order
      */
     List<Timer> getTimers() {
-        return Collections.unmodifiableList(getMutableTimers());
+        return getMutableTimers();
     }
 
     /**
      * @return all expired timers in their expiration order
      */
     List<Timer> getExpiredTimers() {
-        return Collections.unmodifiableList(getMutableExpiredTimers());
+        return getMutableExpiredTimers();
     }
 
     /**
      * @return all missed timers in their expiration order
      */
     private List<Timer> getMissedTimers() {
-        return Collections.unmodifiableList(getMutableMissedTimers());
+        return getMutableMissedTimers();
     }
 
     /**
@@ -228,13 +231,14 @@ final class TimerModel {
     /**
      * @param length         the length of the timer in milliseconds
      * @param label          describes the purpose of the timer
+     * @param buttonTime     the time indicated in the timer add time button
      * @param deleteAfterUse {@code true} indicates the timer should be deleted when it is reset
      * @return the newly added timer
      */
-    Timer addTimer(long length, String label, boolean deleteAfterUse) {
+    Timer addTimer(long length, String label, String buttonTime, boolean deleteAfterUse) {
         // Create the timer instance.
         Timer timer = new Timer(-1, RESET, length, length, Timer.UNUSED, Timer.UNUSED, length,
-                label, deleteAfterUse);
+                label, buttonTime, deleteAfterUse);
 
         // Add the timer to permanent storage.
         timer = TimerDAO.addTimer(mPrefs, timer);
@@ -248,7 +252,7 @@ final class TimerModel {
 
         // Notify listeners of the change.
         for (TimerListener timerListener : mTimerListeners) {
-            timerListener.timerAdded(timer);
+            timerListener.timerAdded(mContext, timer);
         }
 
         return timer;
@@ -466,6 +470,13 @@ final class TimerModel {
     }
 
     /**
+     * @return the duration for which a timer can ring before expiring and being reset
+     */
+    long getTimerAutoSilenceDuration() {
+        return mSettingsModel.getTimerAutoSilenceDuration();
+    }
+
+    /**
      * @return the duration, in milliseconds, of the crescendo to apply to timer ringtone playback;
      * {@code 0} implies no crescendo should be applied
      */
@@ -474,10 +485,38 @@ final class TimerModel {
     }
 
     /**
-     * @return {@code true} if the device vibrates when timers expire
+     * @return {@code true} if the device vibrates when timers expire. {@code false} otherwise.
      */
     boolean getTimerVibrate() {
         return mSettingsModel.getTimerVibrate();
+    }
+
+    /**
+     * @return whether the expired timer is reset with the volume buttons. {@code false} otherwise.
+     */
+    boolean isExpiredTimerResetWithVolumeButtons() {
+        return mSettingsModel.isExpiredTimerResetWithVolumeButtons();
+    }
+
+    /**
+     * @return whether the expired timer is reset with the power button. {@code false} otherwise.
+     */
+    boolean isExpiredTimerResetWithPowerButton() {
+        return mSettingsModel.isExpiredTimerResetWithPowerButton();
+    }
+
+    /**
+     * @return whether flip action for timers is enabled. {@code false} otherwise.
+     */
+    boolean isFlipActionForTimersEnabled() {
+        return mSettingsModel.isFlipActionForTimersEnabled();
+    }
+
+    /**
+     * @return whether shake action for timers is enabled. {@code false} otherwise.
+     */
+    boolean isShakeActionForTimersEnabled() {
+        return mSettingsModel.isShakeActionForTimersEnabled();
     }
 
     /**
@@ -487,10 +526,44 @@ final class TimerModel {
         mSettingsModel.setTimerVibrate(enabled);
     }
 
+    /**
+     * @return the timer sorting manually, in ascending order of duration, in descending order of duration or by name
+     */
+    String getTimerSortingPreference() {
+        return mSettingsModel.getTimerSortingPreference();
+    }
+
+    /**
+     * @return the default minutes or hour to add to timer when the "Add Minute Or Hour" button is clicked.
+     */
+    int getDefaultTimeToAddToTimer() {
+        return mSettingsModel.getDefaultTimeToAddToTimer();
+    }
+
+    /**
+     * @return {@code true} if the timer display must remain on. {@code false} otherwise.
+     */
+    boolean shouldTimerDisplayRemainOn() {
+        return mSettingsModel.shouldTimerDisplayRemainOn();
+    }
+
+    /**
+     * @return {@code true} if the timer background must be transparent. {@code false} otherwise.
+     */
+    boolean isTimerBackgroundTransparent() {
+        return mSettingsModel.isTimerBackgroundTransparent();
+    }
+
+    /**
+     * @return {@code true} if a warning is displayed before deleting a timer. {@code false} otherwise.
+     */
+    boolean isWarningDisplayedBeforeDeletingTimer() {
+        return mSettingsModel.isWarningDisplayedBeforeDeletingTimer();
+    }
+
     private List<Timer> getMutableTimers() {
         if (mTimers == null) {
             mTimers = TimerDAO.getTimers(mPrefs);
-            Collections.sort(mTimers, Timer.ID_COMPARATOR);
         }
 
         return mTimers;
@@ -505,7 +578,7 @@ final class TimerModel {
                     mExpiredTimers.add(timer);
                 }
             }
-            Collections.sort(mExpiredTimers, Timer.EXPIRY_COMPARATOR);
+            Collections.sort(mExpiredTimers, Timer.TIMER_STATE_COMPARATOR);
         }
 
         return mExpiredTimers;
@@ -520,7 +593,7 @@ final class TimerModel {
                     mMissedTimers.add(timer);
                 }
             }
-            Collections.sort(mMissedTimers, Timer.EXPIRY_COMPARATOR);
+            Collections.sort(mMissedTimers, Timer.TIMER_STATE_COMPARATOR);
         }
 
         return mMissedTimers;
@@ -692,6 +765,14 @@ final class TimerModel {
                 mAlarmManager.cancel(pi);
                 pi.cancel();
             }
+        /* TODO: we can consider that issue #5 is solved as indicated in the discussion here: https://github.com/BlackyHawky/Clock/issues/5).
+            Added out of curiosity to see how it will be solved in the LineageOS clock app (https://gitlab.com/LineageOS/issues/android/-/issues/5579). */
+        } else if (nextExpiringTimer.getRemainingTime() <= 0) {
+            mContext.startService(intent);
+        } else if (nextExpiringTimer.getRemainingTime() < 5000) {
+            PowerManager.WakeLock wl = AlarmAlertWakeLock.createPartialWakeLock(mContext);
+            wl.acquire(nextExpiringTimer.getRemainingTime());
+            new Handler().postDelayed(this::updateAlarmManager, nextExpiringTimer.getRemainingTime());
         } else {
             // Update the existing timer expiration callback.
             final PendingIntent pi = PendingIntent.getService(mContext,
@@ -718,8 +799,9 @@ final class TimerModel {
 
         // If the timer is the first to expire, start ringing.
         if (afterState == EXPIRED && mRingingIds.add(after.getId()) && mRingingIds.size() == 1) {
-            AlarmAlertWakeLock.acquireScreenCpuWakeLock(mContext);
+            AlarmAlertWakeLock.acquireCpuWakeLock(mContext);
             TimerKlaxon.start(mContext);
+            stopRingtoneAfterDelay();
         }
 
         // If the expired timer was the last to reset, stop ringing.
@@ -727,6 +809,32 @@ final class TimerModel {
             TimerKlaxon.stop(mContext);
             AlarmAlertWakeLock.releaseCpuLock();
         }
+    }
+
+    /**
+     * Stop timer ringing after a duration selected in Timers settings.
+     */
+    private void stopRingtoneAfterDelay() {
+        Handler handler = new Handler();
+        long duration;
+
+        // Timer silence has been set to "Never"
+        if (getTimerAutoSilenceDuration() == -1) {
+            return;
+        }
+
+        // Timer silence has been set to "At the end of the ringtone"
+        if (getTimerAutoSilenceDuration() == -2) {
+            duration = Utils.getRingtoneDuration(mContext, mTimerRingtoneUri);
+        } else {
+            duration = getTimerAutoSilenceDuration() * 1000;
+        }
+
+        handler.postDelayed(() -> {
+            TimerKlaxon.stop(mContext);
+            resetOrDeleteExpiredTimers(R.string.label_deskclock);
+            AlarmAlertWakeLock.releaseCpuLock();
+        }, duration);
     }
 
     /**
@@ -755,7 +863,7 @@ final class TimerModel {
         }
 
         // Sort the unexpired timers to locate the next one scheduled to expire.
-        Collections.sort(unexpired, Timer.EXPIRY_COMPARATOR);
+        Collections.sort(unexpired, Timer.TIMER_STATE_COMPARATOR);
 
         // Otherwise build and post a notification reflecting the latest unexpired timers.
         final Notification notification =
@@ -847,7 +955,7 @@ final class TimerModel {
     private final class PreferenceListener implements OnSharedPreferenceChangeListener {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-            if (SettingsActivity.KEY_TIMER_RINGTONE.equals(key)) {
+            if (TimerSettingsActivity.KEY_TIMER_RINGTONE.equals(key)) {
                 mTimerRingtoneUri = null;
                 mTimerRingtoneTitle = null;
             }

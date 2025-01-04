@@ -10,8 +10,8 @@ import static android.text.format.DateUtils.MINUTE_IN_MILLIS;
 import static android.text.format.DateUtils.SECOND_IN_MILLIS;
 import static androidx.core.app.NotificationCompat.Action;
 import static androidx.core.app.NotificationCompat.Builder;
-import static com.best.deskclock.NotificationUtils.FIRING_NOTIFICATION_CHANNEL_ID;
-import static com.best.deskclock.NotificationUtils.TIMER_MODEL_NOTIFICATION_CHANNEL_ID;
+import static com.best.deskclock.utils.NotificationUtils.FIRING_NOTIFICATION_CHANNEL_ID;
+import static com.best.deskclock.utils.NotificationUtils.TIMER_MODEL_NOTIFICATION_CHANNEL_ID;
 
 import android.app.AlarmManager;
 import android.app.Notification;
@@ -27,14 +27,14 @@ import android.widget.RemoteViews;
 import androidx.annotation.DrawableRes;
 import androidx.core.app.NotificationCompat;
 
-import com.best.deskclock.AlarmUtils;
 import com.best.deskclock.DeskClock;
-import com.best.deskclock.NotificationUtils;
 import com.best.deskclock.R;
-import com.best.deskclock.Utils;
 import com.best.deskclock.events.Events;
 import com.best.deskclock.timer.ExpiredTimersActivity;
 import com.best.deskclock.timer.TimerService;
+import com.best.deskclock.utils.AlarmUtils;
+import com.best.deskclock.utils.NotificationUtils;
+import com.best.deskclock.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,14 +93,15 @@ class TimerNotificationBuilder {
                 final PendingIntent intent1 = Utils.pendingServiceIntent(context, pause);
                 actions.add(new Action.Builder(icon1, title1, intent1).build());
 
-                // Right Button: +1 Minute
-                final Intent addMinute = new Intent(context, TimerService.class)
-                        .setAction(TimerService.ACTION_ADD_MINUTE_TIMER)
+                // Right Button: +x Minutes or +1 Hour
+                final Intent addMinuteOrHour = new Intent(context, TimerService.class)
+                        .setAction(TimerService.ACTION_ADD_CUSTOM_TIME_TO_TIMER)
                         .putExtra(TimerService.EXTRA_TIMER_ID, timer.getId());
 
                 @DrawableRes final int icon2 = R.drawable.ic_add;
-                final CharSequence title2 = context.getText(R.string.timer_plus_1_min);
-                final PendingIntent intent2 = Utils.pendingServiceIntent(context, addMinute);
+                String customTimeToAdd = timer.getButtonTime();
+                final CharSequence title2 = context.getString(R.string.timer_add_custom_time_for_notification, customTimeToAdd);
+                final PendingIntent intent2 = Utils.pendingServiceIntent(context, addMinuteOrHour);
                 actions.add(new Action.Builder(icon2, title2, intent2).build());
 
             } else {
@@ -246,11 +247,12 @@ class TimerNotificationBuilder {
             final CharSequence title1 = context.getString(R.string.timer_stop);
             actions.add(new Action.Builder(icon1, title1, intent1).build());
 
-            // Right button: Add minute
-            final Intent addTime = TimerService.createAddMinuteTimerIntent(context, timer.getId());
+            // Right Button: +x Minutes or +1 Hour
+            final Intent addTime = TimerService.createAddCustomTimeToTimerIntent(context, timer.getId());
             final PendingIntent intent2 = Utils.pendingServiceIntent(context, addTime);
             @DrawableRes final int icon2 = R.drawable.ic_add;
-            final CharSequence title2 = context.getString(R.string.timer_plus_1_min);
+            String customTimeToAdd = timer.getButtonTime();
+            final CharSequence title2 = context.getString(R.string.timer_add_custom_time_for_notification, customTimeToAdd);
             actions.add(new Action.Builder(icon2, title2, intent2).build());
         } else {
             titleText = context.getString(R.string.timer_multi_times_up, count);

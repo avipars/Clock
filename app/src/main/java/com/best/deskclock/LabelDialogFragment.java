@@ -33,6 +33,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.best.deskclock.data.DataModel;
 import com.best.deskclock.data.Timer;
 import com.best.deskclock.provider.Alarm;
+import com.best.deskclock.utils.Utils;
 
 import java.util.Objects;
 
@@ -126,7 +127,11 @@ public class LabelDialogFragment extends DialogFragment {
         final AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setPositiveButton(android.R.string.ok, new OkListener())
                 .setNegativeButton(android.R.string.cancel, null)
-                .setTitle(R.string.label)
+                .setTitle(mAlarm != null
+                        ? R.string.alarm_label_box_title
+                        : mTimerId >= 0
+                            ? R.string.timer_label_box_title
+                            : 0)
                 .create();
 
         mLabelBox = new AppCompatEditText(requireContext());

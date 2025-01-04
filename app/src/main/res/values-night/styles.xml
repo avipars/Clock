@@ -8,10 +8,12 @@
     <style name="Theme.DeskClock" parent="Theme.Material3.Dark.NoActionBar">
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <!-- For the settings page, ringtone selection and city selection, the color of the navigation bar is defined programmatically -->
-        <item name="android:navigationBarColor">@color/md_theme_surface</item>
+        <!-- For the settings page, ringtone selection and city selection, the color of
+             the navigation bar is defined programmatically -->
+        <item name="android:navigationBarColor">?android:colorBackground</item>
         <item name="bottomNavigationStyle">@style/Widget.Material3.BottomNavigationView</item>
         <item name="colorAccent">@color/md_theme_primary</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:textColorHighlight">@color/md_theme_inversePrimary</item>
 
         <item name="colorPrimary">@color/md_theme_primary</item>
@@ -66,7 +68,29 @@
 
         <item name="preferenceTheme">@style/AppPreferenceThemeOverlay</item>
 
+        <item name="snackbarStyle">@style/SnackBarStyle</item>
+
         <item name="materialTimePickerTheme">@style/ThemeOverlay.App.TimePicker</item>
+        <!-- Todo: This is currently not used but may be useful to resolve issue #4 -->
+        <item name="materialCalendarTheme">@style/ThemeOverlay.App.DatePicker</item>
+    </style>
+
+    <!-- ============ -->
+    <!--    THEMES    -->
+    <!-- ============ -->
+
+    <!-- DEFAULT ACCENT COLOR -->
+    <style name="DefaultColor">
+        <item name="android:colorBackground">@color/md_theme_background</item>
+        <item name="colorBackgroundFloating">@color/md_theme_surface</item>
+        <item name="android:textColorHighlight">@color/md_theme_inversePrimary</item>
+        <item name="colorAccent">@color/md_theme_primary</item>
+        <item name="colorPrimary">@color/md_theme_primary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_primaryContainer</item>
+        <item name="colorPrimaryInverse">@color/md_theme_inversePrimary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_secondaryContainer</item>
+        <item name="colorOnPrimary">@color/md_theme_onPrimary</item>
+        <item name="colorSurface">@color/md_theme_surface</item>
     </style>
 
     <!-- AMOLED THEME -->
@@ -75,6 +99,157 @@
         <item name="android:navigationBarColor">@android:color/black</item>
         <item name="colorBackgroundFloating">@color/md_theme_surfaceContainerLowest</item>
         <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <!-- BLACK THEME -->
+    <style name="BlackAccentColor">
+        <item name="android:colorBackground">@color/blackColorBackground</item>
+        <item name="colorOnBackground">@color/blackColorAccent</item>
+        <item name="colorBackgroundFloating">@color/blackColorGray2</item>
+        <item name="android:textColorHighlight">@color/blackColorGray1</item>
+        <item name="colorAccent">@color/blackColorAccent</item>
+        <item name="colorPrimary">@color/blackColorPrimary</item>
+        <item name="colorPrimaryContainer">@color/blackColorGray3</item>
+        <item name="colorPrimaryInverse">@color/blackColorGray1</item>
+        <item name="colorOnPrimary">@color/blackColorBackground</item>
+        <item name="colorSecondaryContainer">@color/blackColorGray1</item>
+        <item name="colorSurface">@color/blackColorGray2</item>
+        <item name="colorOnSurface">@color/blackColorAccent</item>
+        <item name="colorOnSurfaceVariant">@color/blackColorAccent</item>
+        <item name="colorOutline">@color/blackColorAccent</item>
+    </style>
+
+    <!-- BLUE GRAY THEME -->
+    <style name="BlueGrayAccentColor">
+        <item name="android:navigationBarColor">@color/blueGrayColorSurface</item>
+        <item name="android:colorBackground">@color/blueGrayColorBackground</item>
+        <item name="colorBackgroundFloating">@color/blueGrayColorSurface</item>
+        <item name="android:textColorHighlight">@color/blueGrayPrimaryInverse</item>
+        <item name="colorAccent">@color/blueGrayColorAccent</item>
+        <item name="colorPrimary">@color/blueGrayColorPrimary</item>
+        <item name="colorPrimaryContainer">@color/blueGrayPrimaryContainer</item>
+        <item name="colorPrimaryInverse">@color/blueGrayPrimaryInverse</item>
+        <item name="colorOnPrimary">@color/blueGrayOnPrimary</item>
+        <item name="colorSecondaryContainer">@color/blueGraySecondaryContainer</item>
+        <item name="colorSurface">@color/blueGrayColorSurface</item>
+    </style>
+
+    <!-- BROWN THEME -->
+    <style name="BrownAccentColor">
+        <item name="android:navigationBarColor">@color/brownColorSurface</item>
+        <item name="android:colorBackground">@color/brownColorBackground</item>
+        <item name="colorBackgroundFloating">@color/brownColorSurface</item>
+        <item name="android:textColorHighlight">@color/brownPrimaryInverse</item>
+        <item name="colorAccent">@color/brownColorAccent</item>
+        <item name="colorPrimary">@color/brownColorPrimary</item>
+        <item name="colorPrimaryContainer">@color/brownPrimaryContainer</item>
+        <item name="colorPrimaryInverse">@color/brownPrimaryInverse</item>
+        <item name="colorOnPrimary">@color/brownOnPrimary</item>
+        <item name="colorSecondaryContainer">@color/brownSecondaryContainer</item>
+        <item name="colorSurface">@color/brownColorSurface</item>
+    </style>
+
+    <!-- GREEN THEME -->
+    <style name="GreenAccentColor">
+        <item name="android:navigationBarColor">@color/greenColorSurface</item>
+        <item name="android:colorBackground">@color/greenColorBackground</item>
+        <item name="colorBackgroundFloating">@color/greenColorSurface</item>
+        <item name="android:textColorHighlight">@color/greenPrimaryInverse</item>
+        <item name="colorAccent">@color/greenColorAccent</item>
+        <item name="colorPrimary">@color/greenColorPrimary</item>
+        <item name="colorPrimaryContainer">@color/greenPrimaryContainer</item>
+        <item name="colorPrimaryInverse">@color/greenPrimaryInverse</item>
+        <item name="colorOnPrimary">@color/greenOnPrimary</item>
+        <item name="colorSecondaryContainer">@color/greenSecondaryContainer</item>
+        <item name="colorSurface">@color/greenColorSurface</item>
+    </style>
+
+    <!-- INDIGO THEME -->
+    <style name="IndigoAccentColor">
+        <item name="android:navigationBarColor">@color/indigoColorSurface</item>
+        <item name="android:colorBackground">@color/indigoColorBackground</item>
+        <item name="colorBackgroundFloating">@color/indigoColorSurface</item>
+        <item name="android:textColorHighlight">@color/indigoPrimaryInverse</item>
+        <item name="colorAccent">@color/indigoColorAccent</item>
+        <item name="colorPrimary">@color/indigoColorPrimary</item>
+        <item name="colorPrimaryContainer">@color/indigoPrimaryContainer</item>
+        <item name="colorPrimaryInverse">@color/indigoPrimaryInverse</item>
+        <item name="colorOnPrimary">@color/indigoOnPrimary</item>
+        <item name="colorSecondaryContainer">@color/indigoSecondaryContainer</item>
+        <item name="colorSurface">@color/indigoColorSurface</item>
+    </style>
+
+    <!-- ORANGE THEME -->
+    <style name="OrangeAccentColor">
+        <item name="android:navigationBarColor">@color/orangeColorSurface</item>
+        <item name="android:colorBackground">@color/orangeColorBackground</item>
+        <item name="colorBackgroundFloating">@color/orangeColorSurface</item>
+        <item name="android:textColorHighlight">@color/orangePrimaryInverse</item>
+        <item name="colorAccent">@color/orangeColorAccent</item>
+        <item name="colorPrimary">@color/orangeColorPrimary</item>
+        <item name="colorPrimaryContainer">@color/orangePrimaryContainer</item>
+        <item name="colorPrimaryInverse">@color/orangePrimaryInverse</item>
+        <item name="colorOnPrimary">@color/orangeOnPrimary</item>
+        <item name="colorSecondaryContainer">@color/orangeSecondaryContainer</item>
+        <item name="colorSurface">@color/orangeColorSurface</item>
+    </style>
+
+    <!-- PINK THEME -->
+    <style name="PinkAccentColor">
+        <item name="android:navigationBarColor">@color/pinkColorSurface</item>
+        <item name="android:colorBackground">@color/pinkColorBackground</item>
+        <item name="colorBackgroundFloating">@color/pinkColorSurface</item>
+        <item name="android:textColorHighlight">@color/pinkPrimaryInverse</item>
+        <item name="colorAccent">@color/pinkColorAccent</item>
+        <item name="colorPrimary">@color/pinkColorPrimary</item>
+        <item name="colorPrimaryContainer">@color/pinkPrimaryContainer</item>
+        <item name="colorPrimaryInverse">@color/pinkPrimaryInverse</item>
+        <item name="colorOnPrimary">@color/pinkOnPrimary</item>
+        <item name="colorSecondaryContainer">@color/pinkSecondaryContainer</item>
+        <item name="colorSurface">@color/pinkColorSurface</item>
+    </style>
+
+    <!-- PURPLE THEME -->
+    <style name="PurpleAccentColor">
+        <item name="android:colorBackground">@color/purpleColorBackground</item>
+        <item name="colorBackgroundFloating">@color/purpleColorSurface</item>
+        <item name="android:textColorHighlight">@color/purplePrimaryInverse</item>
+        <item name="colorAccent">@color/purpleColorAccent</item>
+        <item name="colorPrimary">@color/purpleColorPrimary</item>
+        <item name="colorPrimaryContainer">@color/purplePrimaryContainer</item>
+        <item name="colorPrimaryInverse">@color/purplePrimaryInverse</item>
+        <item name="colorOnPrimary">@color/purpleOnPrimary</item>
+        <item name="colorSecondaryContainer">@color/purpleSecondaryContainer</item>
+        <item name="colorSurface">@color/purpleColorSurface</item>
+    </style>
+
+    <!-- RED THEME -->
+    <style name="RedAccentColor">
+        <item name="android:navigationBarColor">@color/redColorSurface</item>
+        <item name="android:colorBackground">@color/redColorBackground</item>
+        <item name="colorBackgroundFloating">@color/redColorSurface</item>
+        <item name="android:textColorHighlight">@color/redPrimaryInverse</item>
+        <item name="colorAccent">@color/redColorAccent</item>
+        <item name="colorPrimary">@color/redColorPrimary</item>
+        <item name="colorPrimaryContainer">@color/redPrimaryContainer</item>
+        <item name="colorPrimaryInverse">@color/redPrimaryInverse</item>
+        <item name="colorOnPrimary">@color/redOnPrimary</item>
+        <item name="colorSecondaryContainer">@color/redSecondaryContainer</item>
+        <item name="colorSurface">@color/redColorSurface</item>
+    </style>
+
+    <!-- YELLOW THEME -->
+    <style name="YellowAccentColor">
+        <item name="android:colorBackground">@color/yellowColorBackground</item>
+        <item name="colorBackgroundFloating">@color/yellowColorSurface</item>
+        <item name="android:textColorHighlight">@color/yellowPrimaryInverse</item>
+        <item name="colorAccent">@color/yellowColorAccent</item>
+        <item name="colorPrimary">@color/yellowColorPrimary</item>
+        <item name="colorPrimaryContainer">@color/yellowPrimaryContainer</item>
+        <item name="colorPrimaryInverse">@color/yellowPrimaryInverse</item>
+        <item name="colorOnPrimary">@color/yellowOnPrimary</item>
+        <item name="colorSecondaryContainer">@color/yellowSecondaryContainer</item>
+        <item name="colorSurface">@color/yellowColorSurface</item>
     </style>
 
 </resources>

@@ -6,102 +6,69 @@
 
 package com.best.deskclock.settings;
 
+import static com.best.deskclock.DeskClock.REQUEST_CHANGE_PERMISSIONS;
+import static com.best.deskclock.DeskClock.REQUEST_CHANGE_SETTINGS;
+import static com.best.deskclock.DeskClockApplication.getDefaultSharedPreferences;
+import static com.best.deskclock.data.WidgetModel.ACTION_UPDATE_WIDGETS_AFTER_RESTORE;
+import static com.best.deskclock.settings.InterfaceCustomizationActivity.DARK_THEME;
+import static com.best.deskclock.settings.InterfaceCustomizationActivity.LIGHT_THEME;
+import static com.best.deskclock.settings.InterfaceCustomizationActivity.SYSTEM_THEME;
+import static com.best.deskclock.settings.ThemeController.Setting.CHANGED;
+
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
-import android.os.Build;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Vibrator;
-import android.provider.Settings;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.format.DateFormat;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.preference.ListPreference;
-import androidx.preference.ListPreferenceDialogFragmentCompat;
 import androidx.preference.Preference;
-import androidx.preference.PreferenceDialogFragmentCompat;
-import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.SwitchPreferenceCompat;
-import androidx.preference.TwoStatePreference;
 
 import com.best.deskclock.R;
-import com.best.deskclock.Utils;
 import com.best.deskclock.data.DataModel;
-import com.best.deskclock.data.TimeZones;
-import com.best.deskclock.data.Weekdays;
-import com.best.deskclock.ringtone.RingtonePickerActivity;
 import com.best.deskclock.widget.CollapsingToolbarBaseActivity;
 
-import java.util.Objects;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Date;
 
 /**
- * Settings for the Alarm Clock.
+ * Application settings
  */
 public final class SettingsActivity extends CollapsingToolbarBaseActivity {
 
+    public static final String PREFS_FRAGMENT_TAG = "settings_prefs_fragment";
+
     public static final String KEY_PERMISSION_MESSAGE = "key_permission_message";
-    public static final String KEY_THEME = "key_theme";
-    public static final String SYSTEM_THEME = "0";
-    public static final String LIGHT_THEME = "1";
-    public static final String DARK_THEME = "2";
-    public static final String KEY_ACCENT_COLOR = "key_accent_color";
-    public static final String DEFAULT_ACCENT_COLOR = "0";
-    public static final String BLUE_GRAY_ACCENT_COLOR = "1";
-    public static final String BROWN_ACCENT_COLOR = "2";
-    public static final String GREEN_ACCENT_COLOR = "3";
-    public static final String INDIGO_ACCENT_COLOR = "4";
-    public static final String ORANGE_ACCENT_COLOR = "5";
-    public static final String PINK_ACCENT_COLOR = "6";
-    public static final String RED_ACCENT_COLOR = "7";
-    public static final String KEY_DARK_MODE = "dark_mode";
-    public static final String KEY_DEFAULT_DARK_MODE = "default";
-    public static final String KEY_AMOLED_DARK_MODE = "amoled";
-    public static final String KEY_CARD_BACKGROUND = "key_card_background";
-    public static final String KEY_CARD_BACKGROUND_BORDER = "key_card_background_border";
-    public static final String KEY_VIBRATIONS = "key_vibrations";
-    public static final String KEY_DEFAULT_ALARM_RINGTONE = "default_alarm_ringtone";
-    public static final String KEY_ALARM_SNOOZE = "snooze_duration";
-    public static final String KEY_ALARM_CRESCENDO = "alarm_crescendo_duration";
-    public static final String KEY_TIMER_CRESCENDO = "timer_crescendo_duration";
-    public static final String KEY_TIMER_RINGTONE = "timer_ringtone";
-    public static final String KEY_TIMER_VIBRATE = "timer_vibrate";
-    public static final String KEY_AUTO_SILENCE = "auto_silence";
-    public static final String KEY_CLOCK_STYLE = "clock_style";
-    public static final String KEY_CLOCK_DISPLAY_SECONDS = "display_clock_seconds";
-    public static final String KEY_HOME_TZ = "home_time_zone";
-    public static final String KEY_AUTO_HOME_CLOCK = "automatic_home_clock";
-    public static final String KEY_DATE_TIME = "date_time";
-    public static final String KEY_SS_SETTINGS = "screensaver_settings";
-    public static final String KEY_VOLUME_BUTTONS = "volume_button_setting";
-    public static final String KEY_POWER_BUTTONS = "power_button";
-    public static final String KEY_WEEK_START = "week_start";
-    public static final String KEY_FLIP_ACTION = "flip_action";
-    public static final String KEY_SHAKE_ACTION = "shake_action";
-    public static final String DEFAULT_VOLUME_BEHAVIOR = "0";
-    public static final String VOLUME_BEHAVIOR_SNOOZE = "1";
-    public static final String VOLUME_BEHAVIOR_DISMISS = "2";
-    public static final String DEFAULT_POWER_BEHAVIOR = "0";
-    public static final String POWER_BEHAVIOR_SNOOZE = "1";
-    public static final String POWER_BEHAVIOR_DISMISS = "2";
-    public static final String KEY_PERMISSIONS_MANAGEMENT = "permissions_management";
-    public static final String PREFS_FRAGMENT_TAG = "prefs_fragment";
-    public static final String PREFERENCE_DIALOG_FRAGMENT_TAG = "preference_dialog";
+    public static final String KEY_INTERFACE_CUSTOMIZATION = "key_interface_customization";
+    public static final String KEY_CLOCK_SETTINGS = "key_clock_settings";
+    public static final String KEY_ALARM_SETTINGS = "key_alarm_settings";
+    public static final String KEY_TIMER_SETTINGS = "key_timer_settings";
+    public static final String KEY_STOPWATCH_SETTINGS = "key_stopwatch_settings";
+    public static final String KEY_SCREENSAVER_SETTINGS = "key_screensaver_settings";
+    public static final String KEY_WIDGETS_SETTINGS = "key_widgets_settings";
+    public static final String KEY_PERMISSIONS_MANAGEMENT = "key_permissions_management";
+    public static final String KEY_BACKUP_RESTORE_PREFERENCES = "key_backup_restore_preferences";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Create the prefs fragment in code to ensure it's created before PreferenceDialogFragment
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.content_frame, new PrefsFragment(), PREFS_FRAGMENT_TAG)
@@ -110,140 +77,129 @@ public final class SettingsActivity extends CollapsingToolbarBaseActivity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, Menu.NONE, 0, R.string.about_title)
-                .setIcon(R.drawable.ic_about).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        return true;
-    }
+    public static class PrefsFragment extends ScreenFragment implements Preference.OnPreferenceClickListener {
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == 0) {
-            final Intent settingIntent = new Intent(getApplicationContext(), AboutActivity.class);
-            startActivity(settingIntent);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    public static class PrefsFragment extends PreferenceFragmentCompat implements
-            Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
-
+        Preference mInterfaceCustomizationPref;
+        Preference mClockSettingsPref;
+        Preference mAlarmSettingsPref;
+        Preference mTimerSettingsPref;
+        Preference mStopwatchSettingsPref;
+        Preference mScreensaverSettings;
+        Preference mWidgetsSettings;
+        Preference mPermissionsManagement;
         Preference mPermissionMessage;
+        Preference mBackupRestorePref;
+
+        /**
+         * Callback for getting the result from the settings sub-activities.
+         */
+        private final ActivityResultLauncher<Intent> getActivity = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(), (result) -> {
+                    if (result.getResultCode() != RESULT_OK) {
+                        return;
+                    }
+
+                    requireActivity().setResult(REQUEST_CHANGE_SETTINGS);
+                });
+
+        /**
+         * Callback for getting the result from the Permission Management activity.
+         */
+        private final ActivityResultLauncher<Intent> getPermissionManagementActivity = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(), (result) -> {
+                    if (result.getResultCode() != REQUEST_CHANGE_PERMISSIONS) {
+                        return;
+                    }
+
+                    requireActivity().setResult(REQUEST_CHANGE_SETTINGS);
+                });
+
+        /**
+         * Callback for getting the backup result.
+         */
+        private final ActivityResultLauncher<Intent> backupToFile = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(), (result) -> {
+                    if (result.getResultCode() != RESULT_OK) {
+                        return;
+                    }
+
+                    Intent intent = result.getData();
+                    final Uri uri = intent == null ? null : intent.getData();
+                    if (uri == null) {
+                        return;
+                    }
+
+                    backupPreferences(requireContext(), uri);
+                    Toast.makeText(requireContext(),
+                            requireContext().getString(R.string.backup_restore_toast_message_for_backup),
+                            Toast.LENGTH_SHORT)
+                            .show();
+                });
+
+        /**
+         * Callback for getting the restoration result.
+         */
+        private final ActivityResultLauncher<Intent> restoreFromFile = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(), (result) -> {
+                    if (result.getResultCode() != RESULT_OK) {
+                        return;
+                    }
+
+                    Intent intent = result.getData();
+                    final Uri uri = intent == null ? null : intent.getData();
+                    if (uri == null) {
+                        return;
+                    }
+
+                    try {
+                        restorePreferences(requireContext(), uri);
+                        // This is to ensure that the interface theme loads correctly after the restore.
+                        String getTheme = DataModel.getDataModel().getTheme();
+                        switch (getTheme) {
+                            case SYSTEM_THEME ->
+                                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                            case LIGHT_THEME ->
+                                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                            case DARK_THEME ->
+                                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                        }
+                        requireContext().sendBroadcast(new Intent(ACTION_UPDATE_WIDGETS_AFTER_RESTORE));
+                        ThemeController.setNewSetting(CHANGED);
+                        Toast.makeText(requireContext(),
+                                requireContext().getString(R.string.backup_restore_toast_message_for_restore),
+                                Toast.LENGTH_SHORT)
+                                .show();
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
 
         @Override
-        public void onCreatePreferences(Bundle bundle, String rootKey) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                getPreferenceManager().setStorageDeviceProtected();
-            }
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
             addPreferencesFromResource(R.xml.settings);
+
+            mInterfaceCustomizationPref = findPreference(KEY_INTERFACE_CUSTOMIZATION);
+            mClockSettingsPref = findPreference(KEY_CLOCK_SETTINGS);
+            mAlarmSettingsPref = findPreference(KEY_ALARM_SETTINGS);
+            mTimerSettingsPref = findPreference(KEY_TIMER_SETTINGS);
+            mStopwatchSettingsPref = findPreference(KEY_STOPWATCH_SETTINGS);
+            mScreensaverSettings = findPreference(KEY_SCREENSAVER_SETTINGS);
+            mWidgetsSettings = findPreference(KEY_WIDGETS_SETTINGS);
+            mPermissionsManagement = findPreference(KEY_PERMISSIONS_MANAGEMENT);
+            mPermissionMessage = findPreference(KEY_PERMISSION_MESSAGE);
+            mBackupRestorePref = findPreference(KEY_BACKUP_RESTORE_PREFERENCES);
+
             hidePreferences();
-            loadTimeZoneList();
-        }
-
-        @Override
-        public void onActivityCreated(Bundle savedInstanceState) {
-            super.onActivityCreated(savedInstanceState);
-
-            // By default, do not recreate the DeskClock activity
-            requireActivity().setResult(RESULT_CANCELED);
         }
 
         @Override
         public void onResume() {
             super.onResume();
+
             refresh();
         }
-
-        @Override
-        public boolean onPreferenceChange(Preference pref, Object newValue) {
-            switch (pref.getKey()) {
-                case KEY_THEME -> {
-                    final ListPreference themePref = (ListPreference) pref;
-                    final int index = themePref.findIndexOfValue((String) newValue);
-                    themePref.setSummary(themePref.getEntries()[index]);
-                    switch (index) {
-                        case 0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-                        case 1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                        case 2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                    }
-                }
-                case KEY_ACCENT_COLOR -> {
-                    final ListPreference themePref = (ListPreference) pref;
-                    final int index = themePref.findIndexOfValue((String) newValue);
-                    themePref.setSummary(themePref.getEntries()[index]);
-                    switch (index) {
-                        case 0 -> ThemeController.applyAccentColor(ThemeController.AccentColor.DEFAULT);
-                        case 1 -> ThemeController.applyAccentColor(ThemeController.AccentColor.BLUE_GRAY);
-                        case 2 -> ThemeController.applyAccentColor(ThemeController.AccentColor.BROWN);
-                        case 3 -> ThemeController.applyAccentColor(ThemeController.AccentColor.GREEN);
-                        case 4 -> ThemeController.applyAccentColor(ThemeController.AccentColor.INDIGO);
-                        case 5 -> ThemeController.applyAccentColor(ThemeController.AccentColor.ORANGE);
-                        case 6 -> ThemeController.applyAccentColor(ThemeController.AccentColor.PINK);
-                        case 7 -> ThemeController.applyAccentColor(ThemeController.AccentColor.RED);
-                    }
-                }
-                case KEY_DARK_MODE -> {
-                    final ListPreference amoledPref = (ListPreference) pref;
-                    final int darkModeIndex = amoledPref.findIndexOfValue((String) newValue);
-                    amoledPref.setSummary(amoledPref.getEntries()[darkModeIndex]);
-                    if (Utils.isNight(requireActivity().getResources())) {
-                        switch (darkModeIndex) {
-                            case 0 -> ThemeController.applyDarkMode(ThemeController.DarkMode.DEFAULT_DARK_MODE);
-                            case 1 -> ThemeController.applyDarkMode(ThemeController.DarkMode.AMOLED);
-                        }
-                    }
-                }
-                case KEY_CARD_BACKGROUND -> {
-                    final TwoStatePreference cardBackgroundPref = (TwoStatePreference) pref;
-                    cardBackgroundPref.setChecked(DataModel.getDataModel().isCardBackgroundDisplayed());
-                    Utils.setVibrationTime(requireContext(), 50);
-                }
-                case KEY_CARD_BACKGROUND_BORDER -> {
-                    final TwoStatePreference cardBackgroundBorderPref = (TwoStatePreference) pref;
-                    cardBackgroundBorderPref.setChecked(DataModel.getDataModel().isCardBackgroundBorderDisplayed());
-                    Utils.setVibrationTime(requireContext(), 50);
-                }
-                case KEY_VIBRATIONS -> {
-                    final TwoStatePreference vibrationsPref = (TwoStatePreference) pref;
-                    vibrationsPref.setChecked(DataModel.getDataModel().isVibrationsEnabled());
-                    Utils.setVibrationTime(requireContext(), 50);
-                }
-                case KEY_CLOCK_STYLE, KEY_ALARM_CRESCENDO, KEY_HOME_TZ, KEY_ALARM_SNOOZE,
-                        KEY_TIMER_CRESCENDO, KEY_VOLUME_BUTTONS, KEY_POWER_BUTTONS, KEY_FLIP_ACTION,
-                        KEY_SHAKE_ACTION, KEY_WEEK_START -> {
-                    final ListPreference preference = (ListPreference) pref;
-                    final int index = preference.findIndexOfValue((String) newValue);
-                    preference.setSummary(preference.getEntries()[index]);
-                }
-                case KEY_CLOCK_DISPLAY_SECONDS -> {
-                    DataModel.getDataModel().setDisplayClockSeconds((boolean) newValue);
-                    Utils.setVibrationTime(requireContext(), 50);
-                }
-                case KEY_AUTO_SILENCE -> {
-                    final String delay = (String) newValue;
-                    updateAutoSnoozeSummary((ListPreference) pref, delay);
-                }
-                case KEY_AUTO_HOME_CLOCK -> {
-                    final boolean autoHomeClockEnabled = ((TwoStatePreference) pref).isChecked();
-                    final Preference homeTimeZonePref = findPreference(KEY_HOME_TZ);
-                    Objects.requireNonNull(homeTimeZonePref).setEnabled(!autoHomeClockEnabled);
-                    Utils.setVibrationTime(requireContext(), 50);
-                }
-                case KEY_TIMER_VIBRATE -> {
-                    final TwoStatePreference timerVibratePref = (TwoStatePreference) pref;
-                    DataModel.getDataModel().setTimerVibrate(timerVibratePref.isChecked());
-                    Utils.setVibrationTime(requireContext(), 50);
-                }
-                case KEY_DEFAULT_ALARM_RINGTONE -> pref.setSummary(DataModel.getDataModel().getAlarmRingtoneTitle());
-                case KEY_TIMER_RINGTONE -> pref.setSummary(DataModel.getDataModel().getTimerRingtoneTitle());
-            }
-            // Set result so DeskClock knows to refresh itself
-            requireActivity().setResult(RESULT_OK);
-            return true;
-        }
-
 
         @Override
         public boolean onPreferenceClick(@NonNull Preference pref) {
@@ -253,29 +209,80 @@ public final class SettingsActivity extends CollapsingToolbarBaseActivity {
             }
 
             switch (pref.getKey()) {
-                case KEY_SS_SETTINGS -> {
-                    final Intent screensaverSettingsIntent = new Intent(context, ScreensaverSettingsActivity.class);
+                case KEY_INTERFACE_CUSTOMIZATION -> {
+                    final Intent interfaceCustomizationIntent =
+                            new Intent(context, InterfaceCustomizationActivity.class);
+                    getActivity.launch(interfaceCustomizationIntent);
+                    return true;
+                }
+
+                case KEY_CLOCK_SETTINGS -> {
+                    final Intent clockSettingsIntent = new Intent(context, ClockSettingsActivity.class);
+                    getActivity.launch(clockSettingsIntent);
+                    return true;
+                }
+
+                case KEY_ALARM_SETTINGS -> {
+                    final Intent alarmSettingsIntent = new Intent(context, AlarmSettingsActivity.class);
+                    getActivity.launch(alarmSettingsIntent);
+                    return true;
+                }
+
+                case KEY_TIMER_SETTINGS -> {
+                    final Intent timerSettingsIntent = new Intent(context, TimerSettingsActivity.class);
+                    getActivity.launch(timerSettingsIntent);
+                    return true;
+                }
+
+                case KEY_STOPWATCH_SETTINGS -> {
+                    final Intent stopwatchSettingsIntent = new Intent(context, StopwatchSettingsActivity.class);
+                    getActivity.launch(stopwatchSettingsIntent);
+                    return true;
+                }
+
+                case KEY_SCREENSAVER_SETTINGS -> {
+                    final Intent screensaverSettingsIntent =
+                            new Intent(context, ScreensaverSettingsActivity.class);
                     startActivity(screensaverSettingsIntent);
                     return true;
                 }
-                case KEY_DATE_TIME -> {
-                    final Intent dialogIntent = new Intent(Settings.ACTION_DATE_SETTINGS);
-                    dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(dialogIntent);
+
+                case KEY_WIDGETS_SETTINGS -> {
+                    final Intent widgetsSettingsIntent = new Intent(context, WidgetsSettingsActivity.class);
+                    startActivity(widgetsSettingsIntent);
                     return true;
                 }
-                case KEY_DEFAULT_ALARM_RINGTONE -> {
-                    startActivity(RingtonePickerActivity.createAlarmRingtonePickerIntentForSettings(context));
-                    return true;
-                }
-                case KEY_TIMER_RINGTONE -> {
-                    startActivity(RingtonePickerActivity.createTimerRingtonePickerIntent(context));
-                    return true;
-                }
+
                 case KEY_PERMISSION_MESSAGE, KEY_PERMISSIONS_MANAGEMENT -> {
-                    final Intent permissionsManagementIntent = new Intent(context, PermissionsManagementActivity.class);
-                    startActivity(permissionsManagementIntent);
-                    requireActivity().setResult(RESULT_OK);
+                    final Intent permissionsManagementIntent =
+                            new Intent(context, PermissionsManagementActivity.class);
+                    getPermissionManagementActivity.launch(permissionsManagementIntent);
+                    return true;
+                }
+
+                case KEY_BACKUP_RESTORE_PREFERENCES -> {
+                    final AlertDialog builder = new AlertDialog.Builder(requireContext())
+                            .setIcon(R.drawable.ic_backup_restore)
+                            .setTitle(R.string.backup_restore_settings_title)
+                            .setMessage(R.string.backup_restore_dialog_message)
+                            .setPositiveButton(android.R.string.cancel, null)
+                            .setNegativeButton(R.string.backup_restore_backup_button_title, (dialog, which) -> {
+                                String currentDateAndTime = DateFormat.format("yyyy_MM_dd_HH-mm-ss", new Date()).toString();
+                                Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
+                                        .addCategory(Intent.CATEGORY_OPENABLE)
+                                        .putExtra(Intent.EXTRA_TITLE, requireContext().getString(R.string.app_label)
+                                                + "_backup_" + currentDateAndTime + ".json")
+                                        .setType("application/json");
+                                backupToFile.launch(intent);
+                            })
+                            .setNeutralButton(R.string.backup_restore_restore_button_title, (dialog, which) -> {
+                                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT)
+                                        .addCategory(Intent.CATEGORY_OPENABLE)
+                                        .setType("application/json");
+                                restoreFromFile.launch(intent);
+                            })
+                            .create();
+                    builder.show();
                     return true;
                 }
             }
@@ -283,189 +290,64 @@ public final class SettingsActivity extends CollapsingToolbarBaseActivity {
             return false;
         }
 
-        @Override
-        public void onDisplayPreferenceDialog(@NonNull Preference preference) {
-            // Only single-selection lists are currently supported.
-            final PreferenceDialogFragmentCompat f;
-            if (preference instanceof ListPreference) {
-                f = ListPreferenceDialogFragmentCompat.newInstance(preference.getKey());
-            } else {
-                throw new IllegalArgumentException("Unsupported DialogPreference type");
-            }
-            showDialog(f);
-        }
-
-        private void showDialog(PreferenceDialogFragmentCompat fragment) {
-            // Don't show dialog if one is already shown.
-            if (getParentFragmentManager().findFragmentByTag(PREFERENCE_DIALOG_FRAGMENT_TAG) != null) {
-                return;
-            }
-            // Always set the target fragment, this is required by PreferenceDialogFragment
-            // internally.
-            fragment.setTargetFragment(this, 0);
-            // Don't use getChildFragmentManager(), it causes issues on older platforms when the
-            // target fragment is being restored after an orientation change.
-            fragment.show(getParentFragmentManager(), PREFERENCE_DIALOG_FRAGMENT_TAG);
-        }
-
         private void hidePreferences() {
-            mPermissionMessage = findPreference(KEY_PERMISSION_MESSAGE);
-            final Preference vibrations = findPreference(KEY_VIBRATIONS);
-            final Preference timerVibrate = findPreference(KEY_TIMER_VIBRATE);
-            final boolean hasVibrator = ((Vibrator) Objects.requireNonNull(timerVibrate).getContext()
-                    .getSystemService(VIBRATOR_SERVICE)).hasVibrator();
-
-            if (mPermissionMessage != null) {
-                mPermissionMessage.setVisible(PermissionsManagementActivity.areEssentialPermissionsNotGranted(requireContext()));
-            }
-
-            Objects.requireNonNull(vibrations).setVisible(hasVibrator);
-
-            timerVibrate.setVisible(hasVibrator);
-        }
-
-        /**
-         * Reconstruct the timezone list.
-         */
-        private void loadTimeZoneList() {
-            final TimeZones timezones = DataModel.getDataModel().getTimeZones();
-            final ListPreference homeTimezonePref = findPreference(KEY_HOME_TZ);
-            Objects.requireNonNull(homeTimezonePref).setEntryValues(timezones.getTimeZoneIds());
-            homeTimezonePref.setEntries(timezones.getTimeZoneNames());
-            homeTimezonePref.setSummary(homeTimezonePref.getEntry());
-            homeTimezonePref.setOnPreferenceChangeListener(this);
+            mPermissionMessage.setVisible(
+                        PermissionsManagementActivity.areEssentialPermissionsNotGranted(requireContext())
+            );
         }
 
         private void refresh() {
-            mPermissionMessage.setVisible(PermissionsManagementActivity.areEssentialPermissionsNotGranted(requireContext()));
-            final SpannableStringBuilder builder = new SpannableStringBuilder();
-            final String messagePermission = requireContext().getString(R.string.settings_permission_message);
-            final Spannable redMessagePermission = new SpannableString(messagePermission);
-            if (messagePermission != null) {
-                redMessagePermission.setSpan(new ForegroundColorSpan(Color.RED), 0, messagePermission.length(), 0);
-                redMessagePermission.setSpan(new StyleSpan(Typeface.BOLD), 0, messagePermission.length(), 0);
+            mPermissionMessage.setVisible(
+                    PermissionsManagementActivity.areEssentialPermissionsNotGranted(requireContext())
+            );
+            if (mPermissionMessage.isShown()) {
+                final SpannableStringBuilder builderPermissionMessage = new SpannableStringBuilder();
+                final String messagePermission = requireContext().getString(R.string.settings_permission_message);
+                final Spannable spannableMessagePermission = new SpannableString(messagePermission);
+                spannableMessagePermission.setSpan(
+                        new ForegroundColorSpan(requireContext().getColor(R.color.colorAlert)),
+                        0, messagePermission.length(), 0);
+                spannableMessagePermission.setSpan(
+                        new StyleSpan(Typeface.BOLD), 0, messagePermission.length(), 0);
+                builderPermissionMessage.append(spannableMessagePermission);
+                mPermissionMessage.setTitle(builderPermissionMessage);
+                mPermissionMessage.setOnPreferenceClickListener(this);
             }
-            builder.append(redMessagePermission);
-            mPermissionMessage.setTitle(builder);
-            mPermissionMessage.setOnPreferenceClickListener(this);
 
-            final ListPreference themePref = findPreference(KEY_THEME);
-            Objects.requireNonNull(themePref).setSummary(themePref.getEntry());
-            themePref.setOnPreferenceChangeListener(this);
+            mInterfaceCustomizationPref.setOnPreferenceClickListener(this);
 
-            final ListPreference colorPref = findPreference(KEY_ACCENT_COLOR);
-            Objects.requireNonNull(colorPref).setSummary(colorPref.getEntry());
-            colorPref.setOnPreferenceChangeListener(this);
+            mClockSettingsPref.setOnPreferenceClickListener(this);
 
-            final ListPreference amoledModePref = findPreference(KEY_DARK_MODE);
-            Objects.requireNonNull(amoledModePref).setSummary(amoledModePref.getEntry());
-            amoledModePref.setOnPreferenceChangeListener(this);
+            mAlarmSettingsPref.setOnPreferenceClickListener(this);
 
-            final SwitchPreferenceCompat cardBackgroundPref = findPreference(KEY_CARD_BACKGROUND);
-            Objects.requireNonNull(cardBackgroundPref).setOnPreferenceChangeListener(this);
+            mTimerSettingsPref.setOnPreferenceClickListener(this);
 
-            final SwitchPreferenceCompat cardBackgroundBorderPref = findPreference(KEY_CARD_BACKGROUND_BORDER);
-            Objects.requireNonNull(cardBackgroundBorderPref).setOnPreferenceChangeListener(this);
+            mStopwatchSettingsPref.setOnPreferenceClickListener(this);
 
-            final SwitchPreferenceCompat vibrationsPref = findPreference(KEY_VIBRATIONS);
-            Objects.requireNonNull(vibrationsPref).setOnPreferenceChangeListener(this);
+            mScreensaverSettings.setOnPreferenceClickListener(this);
 
-            final ListPreference autoSilencePref = findPreference(KEY_AUTO_SILENCE);
-            String delay = Objects.requireNonNull(autoSilencePref).getValue();
-            updateAutoSnoozeSummary(autoSilencePref, delay);
-            autoSilencePref.setOnPreferenceChangeListener(this);
+            mWidgetsSettings.setOnPreferenceClickListener(this);
 
-            final ListPreference clockStylePref = findPreference(KEY_CLOCK_STYLE);
-            Objects.requireNonNull(clockStylePref).setSummary(clockStylePref.getEntry());
-            clockStylePref.setOnPreferenceChangeListener(this);
+            mPermissionsManagement.setOnPreferenceClickListener(this);
 
-            final ListPreference volumeButtonsPref = findPreference(KEY_VOLUME_BUTTONS);
-            Objects.requireNonNull(volumeButtonsPref).setSummary(volumeButtonsPref.getEntry());
-            volumeButtonsPref.setOnPreferenceChangeListener(this);
-
-            final ListPreference powerButtonsPref = findPreference(KEY_POWER_BUTTONS);
-            Objects.requireNonNull(powerButtonsPref).setSummary(powerButtonsPref.getEntry());
-            powerButtonsPref.setOnPreferenceChangeListener(this);
-
-            final Preference clockSecondsPref = findPreference(KEY_CLOCK_DISPLAY_SECONDS);
-            Objects.requireNonNull(clockSecondsPref).setOnPreferenceChangeListener(this);
-
-            final Preference autoHomeClockPref = findPreference(KEY_AUTO_HOME_CLOCK);
-            final boolean autoHomeClockEnabled =
-                    ((TwoStatePreference) Objects.requireNonNull(autoHomeClockPref)).isChecked();
-            autoHomeClockPref.setOnPreferenceChangeListener(this);
-
-            final ListPreference homeTimezonePref = findPreference(KEY_HOME_TZ);
-            Objects.requireNonNull(homeTimezonePref).setEnabled(autoHomeClockEnabled);
-            refreshListPreference(homeTimezonePref);
-
-            refreshListPreference(Objects.requireNonNull(findPreference(KEY_ALARM_CRESCENDO)));
-            refreshListPreference(Objects.requireNonNull(findPreference(KEY_TIMER_CRESCENDO)));
-            refreshListPreference(Objects.requireNonNull(findPreference(KEY_ALARM_SNOOZE)));
-
-            final Preference dateAndTimeSetting = findPreference(KEY_DATE_TIME);
-            Objects.requireNonNull(dateAndTimeSetting).setOnPreferenceClickListener(this);
-
-            final Preference screensaverSettings = findPreference(KEY_SS_SETTINGS);
-            Objects.requireNonNull(screensaverSettings).setOnPreferenceClickListener(this);
-
-            final ListPreference weekStartPref = findPreference(KEY_WEEK_START);
-            // Set the default value programmatically
-            final Weekdays.Order weekdayOrder = DataModel.getDataModel().getWeekdayOrder();
-            final Integer firstDay = weekdayOrder.getCalendarDays().get(0);
-            final String value = String.valueOf(firstDay);
-            final int idx = Objects.requireNonNull(weekStartPref).findIndexOfValue(value);
-            weekStartPref.setValueIndex(idx);
-            weekStartPref.setSummary(weekStartPref.getEntries()[idx]);
-            weekStartPref.setOnPreferenceChangeListener(this);
-
-            final Preference alarmRingtonePref = findPreference(KEY_DEFAULT_ALARM_RINGTONE);
-            Objects.requireNonNull(alarmRingtonePref).setOnPreferenceClickListener(this);
-            alarmRingtonePref.setSummary(DataModel.getDataModel().getAlarmRingtoneTitle());
-
-            final Preference timerRingtonePref = findPreference(KEY_TIMER_RINGTONE);
-            Objects.requireNonNull(timerRingtonePref).setOnPreferenceClickListener(this);
-            timerRingtonePref.setSummary(DataModel.getDataModel().getTimerRingtoneTitle());
-
-            final ListPreference flipActionPref = findPreference(KEY_FLIP_ACTION);
-            setupFlipOrShakeAction(flipActionPref);
-
-            final ListPreference shakeActionPref = findPreference(KEY_SHAKE_ACTION);
-            setupFlipOrShakeAction(shakeActionPref);
-
-            final SwitchPreferenceCompat timerVibratePref = findPreference(KEY_TIMER_VIBRATE);
-            Objects.requireNonNull(timerVibratePref).setOnPreferenceChangeListener(this);
-
-            final Preference permissionsManagement = findPreference(KEY_PERMISSIONS_MANAGEMENT);
-            Objects.requireNonNull(permissionsManagement).setOnPreferenceClickListener(this);
+            mBackupRestorePref.setOnPreferenceClickListener(this);
         }
 
-        private void setupFlipOrShakeAction(ListPreference preference) {
-            if (preference != null) {
-                SensorManager sensorManager = (SensorManager) requireActivity().getSystemService(Context.SENSOR_SERVICE);
-                if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) == null) {
-                    preference.setValue("0");  // Turn it off
-                    preference.setVisible(false);
-                } else {
-                    preference.setSummary(preference.getEntry());
-                    preference.setOnPreferenceChangeListener(this);
-                }
+        private void backupPreferences(Context context, Uri uri) {
+            SharedPreferences sharedPreferences = getDefaultSharedPreferences(context);
+
+            try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri)) {
+                BackupAndRestoreUtils.settingsToJsonStream(sharedPreferences.getAll(), outputStream, sharedPreferences, context);
+            } catch (IOException e) {
+                Log.w(PREFS_FRAGMENT_TAG, "error during backup");
             }
         }
 
-        private void refreshListPreference(ListPreference preference) {
-            preference.setSummary(preference.getEntry());
-            preference.setOnPreferenceChangeListener(this);
-        }
+        private void restorePreferences(Context context, Uri uri) throws FileNotFoundException {
+            InputStream inputStream = context.getContentResolver().openInputStream(uri);
+            SharedPreferences sharedPreferences = getDefaultSharedPreferences(context);
 
-        private void updateAutoSnoozeSummary(ListPreference listPref, String delay) {
-            int i = Integer.parseInt(delay);
-            if (i == -1) {
-                listPref.setSummary(R.string.auto_silence_never);
-            } else {
-                listPref.setSummary(Utils.getNumberFormattedQuantityString(requireActivity(),
-                        R.plurals.auto_silence_summary, i));
-            }
+            BackupAndRestoreUtils.readJsonLines(inputStream, sharedPreferences);
         }
     }
 }

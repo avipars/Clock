@@ -6,6 +6,8 @@
 
 package com.best.deskclock.alarms;
 
+import static com.best.deskclock.settings.AlarmSettingsActivity.MATERIAL_TIME_PICKER_ANALOG_STYLE;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,14 +18,14 @@ import androidx.fragment.app.Fragment;
 
 import com.best.deskclock.AlarmClockFragment;
 import com.best.deskclock.LabelDialogFragment;
-import com.best.deskclock.LogUtils;
 import com.best.deskclock.R;
-import com.best.deskclock.Utils;
 import com.best.deskclock.alarms.dataadapter.AlarmItemHolder;
 import com.best.deskclock.data.DataModel;
 import com.best.deskclock.events.Events;
 import com.best.deskclock.provider.Alarm;
 import com.best.deskclock.ringtone.RingtonePickerActivity;
+import com.best.deskclock.utils.LogUtils;
+import com.best.deskclock.utils.Utils;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 
@@ -40,17 +42,15 @@ public final class AlarmTimeClickHandler {
     private final Fragment mFragment;
     private final Context mContext;
     private final AlarmUpdateHandler mAlarmUpdateHandler;
-    private final ScrollHandler mScrollHandler;
     private Alarm mSelectedAlarm;
     private Bundle mPreviousDaysOfWeekMap;
 
-    public AlarmTimeClickHandler(Fragment fragment, Bundle savedState,
-                                 AlarmUpdateHandler alarmUpdateHandler, ScrollHandler smoothScrollController) {
+    public AlarmTimeClickHandler(Fragment fragment, Bundle savedState, AlarmUpdateHandler alarmUpdateHandler) {
 
         mFragment = fragment;
         mContext = mFragment.requireActivity().getApplicationContext();
         mAlarmUpdateHandler = alarmUpdateHandler;
-        mScrollHandler = smoothScrollController;
+
         if (savedState != null) {
             mPreviousDaysOfWeekMap = savedState.getBundle(KEY_PREVIOUS_DAY_MAP);
         }
@@ -73,6 +73,26 @@ public final class AlarmTimeClickHandler {
         }
     }
 
+    public void setDismissAlarmWhenRingtoneEndsEnabled(Alarm alarm, boolean newState) {
+        if (newState != alarm.dismissAlarmWhenRingtoneEnds) {
+            alarm.dismissAlarmWhenRingtoneEnds = newState;
+            Events.sendAlarmEvent(R.string.action_toggle_dismiss_alarm_when_ringtone_ends, R.string.label_deskclock);
+            mAlarmUpdateHandler.asyncUpdateAlarm(alarm, false, true);
+            LOGGER.d("Updating dismiss alarm state to " + newState);
+            Utils.setVibrationTime(mContext, 50);
+        }
+    }
+
+    public void setAlarmSnoozeActionsEnabled(Alarm alarm, boolean newState) {
+        if (newState != alarm.alarmSnoozeActions) {
+            alarm.alarmSnoozeActions = newState;
+            Events.sendAlarmEvent(R.string.action_toggle_alarm_snooze_actions, R.string.label_deskclock);
+            mAlarmUpdateHandler.asyncUpdateAlarm(alarm, false, true);
+            LOGGER.d("Updating snooze alarm state to " + newState);
+            Utils.setVibrationTime(mContext, 50);
+        }
+    }
+
     public void setAlarmVibrationEnabled(Alarm alarm, boolean newState) {
         if (newState != alarm.vibrate) {
             alarm.vibrate = newState;
@@ -84,6 +104,16 @@ public final class AlarmTimeClickHandler {
                 // Buzz the vibrator to preview the alarm firing behavior.
                 Utils.setVibrationTime(mContext, 300);
             }
+        }
+    }
+
+    public void deleteOccasionalAlarmAfterUse(Alarm alarm, boolean newState) {
+        if (newState != alarm.deleteAfterUse) {
+            alarm.deleteAfterUse = newState;
+            Events.sendAlarmEvent(R.string.action_delete_alarm_after_use, R.string.label_deskclock);
+            mAlarmUpdateHandler.asyncUpdateAlarm(alarm, false, false);
+            LOGGER.d("Delete alarm after use state to " + newState);
+            Utils.setVibrationTime(mContext, 50);
         }
     }
 
@@ -125,14 +155,16 @@ public final class AlarmTimeClickHandler {
     }
 
     private void ShowMaterialTimePicker(int hour, int minute) {
-
         @TimeFormat int clockFormat;
         boolean isSystem24Hour = DateFormat.is24HourFormat(mFragment.getContext());
         clockFormat = isSystem24Hour ? TimeFormat.CLOCK_24H : TimeFormat.CLOCK_12H;
+        String materialTimePickerStyle = DataModel.getDataModel().getMaterialTimePickerStyle();
 
         MaterialTimePicker materialTimePicker = new MaterialTimePicker.Builder()
                 .setTimeFormat(clockFormat)
-                .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
+                .setInputMode(materialTimePickerStyle.equals(MATERIAL_TIME_PICKER_ANALOG_STYLE)
+                        ? MaterialTimePicker.INPUT_MODE_CLOCK
+                        : MaterialTimePicker.INPUT_MODE_KEYBOARD)
                 .setHour(hour)
                 .setMinute(minute)
                 .build();
@@ -164,16 +196,20 @@ public final class AlarmTimeClickHandler {
         if (mSelectedAlarm == null) {
             // If mSelectedAlarm is null then we're creating a new alarm.
             final Alarm alarm = new Alarm();
+            final boolean areAlarmVibrationsEnabledByDefault = DataModel.getDataModel().areAlarmVibrationsEnabledByDefault();
+            final boolean isOccasionalAlarmDeletedByDefault = DataModel.getDataModel().isOccasionalAlarmDeletedByDefault();
             alarm.hour = hourOfDay;
             alarm.minutes = minute;
             alarm.enabled = true;
-            alarm.vibrate = false;
+            alarm.dismissAlarmWhenRingtoneEnds = false;
+            alarm.alarmSnoozeActions = true;
+            alarm.vibrate = areAlarmVibrationsEnabledByDefault;
+            alarm.deleteAfterUse = isOccasionalAlarmDeletedByDefault;
             mAlarmUpdateHandler.asyncAddAlarm(alarm);
         } else {
             mSelectedAlarm.hour = hourOfDay;
             mSelectedAlarm.minutes = minute;
             mSelectedAlarm.enabled = true;
-            mScrollHandler.setSmoothScrollStableId(mSelectedAlarm.id);
             mAlarmUpdateHandler.asyncUpdateAlarm(mSelectedAlarm, true, false);
             mSelectedAlarm = null;
         }

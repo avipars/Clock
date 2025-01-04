@@ -16,7 +16,7 @@ import android.content.Context;
 import androidx.annotation.StringRes;
 
 import com.best.deskclock.R;
-import com.best.deskclock.Utils;
+import com.best.deskclock.utils.Utils;
 
 public class TimerStringFormatter {
 
@@ -105,9 +105,9 @@ public class TimerStringFormatter {
                 secSeq);
     }
 
-    public static String formatString(Context context, @StringRes int stringResId, long currentTime,
+    public static String formatString(Context context, @StringRes int stringResId, String buttonTime, long currentTime,
                                       boolean shouldShowSeconds) {
-        return String.format(context.getString(stringResId),
+        return String.format(context.getString(stringResId), buttonTime,
                 formatTimeRemaining(context, currentTime, shouldShowSeconds));
     }
 }
